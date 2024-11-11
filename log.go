@@ -9,7 +9,6 @@ import (
 
 func Log(vanError VanError) error {
 	// Setting the logger output
-	log.SetOutput(vanError.logger)
 
 	// creating log data
 	var data logData
