@@ -21,6 +21,4 @@ var DefaultLoggerOptions LoggerOptions = LoggerOptions{
 	ShowCause:       true,
 }
 
-var EmptyLoggerOptions LoggerOptions = LoggerOptions{
-	DoLog: false,
-}
+var EmptyLoggerOptions LoggerOptions = LoggerOptions{}

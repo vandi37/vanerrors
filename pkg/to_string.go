@@ -42,9 +42,5 @@ func (e VanError) Error() string {
 	if options.ShowCause {
 		err += "cause: " + e.Cause.Error() + " "
 	}
-
-	if e.LoggerOptions.DoLog && e.LoggerOptions.LogBy && e.logger != nil {
-		Log(e)
-	}
 	return err
 }
