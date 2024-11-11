@@ -7,9 +7,9 @@ import (
 	"strings"
 )
 
-func Log(errorData ErrorData, loggerOptions LoggerOptions) error {
+func Log(vanError VanError) error {
 	// Setting the logger output
-	log.SetOutput(errorData.Logger)
+	log.SetOutput(vanError.logger)
 
 	// creating log data
 	var data logData
@@ -18,27 +18,27 @@ func Log(errorData ErrorData, loggerOptions LoggerOptions) error {
 	var logStr string
 
 	// Adding code
-	if loggerOptions.ShowCode {
-		logStr += fmt.Sprintf("%d ", errorData.Code)
+	if vanError.LoggerOptions.ShowCode {
+		logStr += fmt.Sprintf("%d ", vanError.Code)
 	}
 
 	// Adding name
-	logStr += errorData.Name
+	logStr += vanError.Name
 	// Adding message
-	if trimMessage := strings.TrimSpace(errorData.Message); trimMessage != "" && loggerOptions.ShowMessage {
-		logStr += fmt.Sprintf(": %s", errorData.Message)
+	if trimMessage := strings.TrimSpace(vanError.Message); trimMessage != "" && vanError.LoggerOptions.ShowMessage {
+		logStr += fmt.Sprintf(": %s", vanError.Message)
 	}
 
 	// Adding the string
 	data.BaseMes = logStr
 
 	// Adding severity
-	if loggerOptions.ShowSeverity {
+	if vanError.LoggerOptions.ShowSeverity {
 		var severity any
-		if loggerOptions.IntSeverity {
-			severity = SeverityArray[errorData.Severity]
+		if vanError.LoggerOptions.IntSeverity {
+			severity = SeverityArray[vanError.Severity]
 		} else {
-			severity = errorData.Severity
+			severity = vanError.Severity
 		}
 
 		data.Severity = severity
@@ -46,9 +46,9 @@ func Log(errorData ErrorData, loggerOptions LoggerOptions) error {
 	}
 
 	// Adding description
-	if loggerOptions.ShowDescription && errorData.Description != nil {
+	if vanError.LoggerOptions.ShowDescription && vanError.Description != nil {
 		description := make([]byte, 4096)
-		n, err := errorData.Description.Read(description)
+		n, err := vanError.Description.Read(description)
 		if err == nil {
 			description = description[:n]
 		}
@@ -57,19 +57,19 @@ func Log(errorData ErrorData, loggerOptions LoggerOptions) error {
 	}
 
 	// Adding cause
-	if loggerOptions.ShowCause && errorData.Cause != nil {
-		data.Cause = errorData.Cause
+	if vanError.LoggerOptions.ShowCause && vanError.Cause != nil {
+		data.Cause = vanError.Cause
 	}
 
 	// Getting the result string
-	logger := log.New(errorData.Logger, "", log.LstdFlags|log.Llongfile|log.Llongfile)
-	if loggerOptions.LogWith {
+	logger := log.New(vanError.logger, "", log.LstdFlags|log.Llongfile|log.Llongfile)
+	if vanError.LoggerOptions.LogWith {
 		result, err := json.Marshal(data)
 		if err != nil {
 			err, _ := New(
 				ErrorData{
 					Name:     "severity is not valid",
-					Message:  fmt.Sprintf("$d is les than 0 or bigger than 3", errorData.Severity),
+					Message:  fmt.Sprintf("%d is les than 0 or bigger than 3", vanError.Severity),
 					Code:     400,
 					Severity: 2,
 				},
@@ -78,14 +78,14 @@ func Log(errorData ErrorData, loggerOptions LoggerOptions) error {
 			)
 			return err
 		}
-		if errorData.Severity == 3 {
+		if vanError.Severity == 3 {
 
 			logger.Fatalln(string(result))
 		}
 		logger.Println(string(result))
 	} else {
-		result := data.String(loggerOptions)
-		if errorData.Severity == 3 {
+		result := data.String(vanError.LoggerOptions)
+		if vanError.Severity == 3 {
 
 			logger.Fatalln(result)
 		}

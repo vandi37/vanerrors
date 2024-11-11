@@ -20,7 +20,7 @@ func New(errorData ErrorData, options Options, loggerOptions LoggerOptions) (*Va
 		err, _ := New(
 			ErrorData{
 				Name:     "severity is not valid",
-				Message:  fmt.Sprintf("$d is les than 0 or bigger than 3", errorData.Severity),
+				Message:  fmt.Sprintf("%d is les than 0 or bigger than 3", errorData.Severity),
 				Code:     400,
 				Severity: 2,
 			},
@@ -45,7 +45,7 @@ func New(errorData ErrorData, options Options, loggerOptions LoggerOptions) (*Va
 	}
 	// Logging if it needs to be when created
 	if loggerOptions.DoLog && !loggerOptions.LogBy && errorData.Logger != nil {
-		err := Log(errorData, loggerOptions)
+		err := Log(vanError)
 		if err != nil {
 			return nil, err
 		}
@@ -53,5 +53,3 @@ func New(errorData ErrorData, options Options, loggerOptions LoggerOptions) (*Va
 
 	return &vanError, nil
 }
-
-func (e VanError) Error() string
