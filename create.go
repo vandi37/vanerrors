@@ -1,12 +1,21 @@
 package vanerrors
 
 import (
-	"fmt"
 	"strings"
 	"time"
 )
 
-func New(errorData ErrorData, options Options, loggerOptions LoggerOptions) (*VanError, error) {
+// Creates a new VanError
+//
+// errorData: the data to create the error
+// options: options how to show the error
+// loggerOptions: the logger options
+//
+// sets default:
+// Name == "" -> "unknown error"
+// Code <= 0 -> 500
+// Severity < 0 | Severity > 3 -> 2
+func New(errorData ErrorData, options Options, loggerOptions LoggerOptions) VanError {
 	// Validating name
 	if errorName := strings.TrimSpace(errorData.Name); errorName == "" {
 		errorData.Name = "unknown error"
@@ -16,18 +25,7 @@ func New(errorData ErrorData, options Options, loggerOptions LoggerOptions) (*Va
 		errorData.Code = 500
 	}
 	if errorData.Severity < 0 || errorData.Severity > 3 {
-		// Sending error
-		err, _ := New(
-			ErrorData{
-				Name:     "severity is not valid",
-				Message:  fmt.Sprintf("%d is les than 0 or bigger than 3", errorData.Severity),
-				Code:     400,
-				Severity: 2,
-			},
-			DefaultOptions,
-			EmptyLoggerOptions,
-		)
-		return nil, err
+		errorData.Severity = 2
 	}
 	// Creating a vanError
 	now := time.Now()
@@ -45,11 +43,8 @@ func New(errorData ErrorData, options Options, loggerOptions LoggerOptions) (*Va
 	}
 	// Logging if it needs to be when created
 	if loggerOptions.DoLog && !loggerOptions.LogBy && errorData.Logger != nil {
-		err := Log(vanError)
-		if err != nil {
-			return nil, err
-		}
+		Log(vanError)
 	}
 
-	return &vanError, nil
+	return vanError
 }

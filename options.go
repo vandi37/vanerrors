@@ -83,13 +83,4 @@ type LoggerOptions struct {
 	//
 	// recommended : false
 	LogBy bool `json:"log_by"`
-	// The log type
-	//
-	// false : no json
-	// true : json log type
-	//
-	// recommended:
-	// for development : false
-	// for production : true
-	LogWith bool `json:"log_with"`
 }
