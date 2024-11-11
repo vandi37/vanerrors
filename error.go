@@ -6,7 +6,6 @@ import (
 )
 
 // An error structure
-//
 // it has different information about the error
 type VanError struct {
 	// The error name
@@ -64,4 +63,15 @@ type VanError struct {
 	//
 	// It controls the error date
 	Date time.Time `json:"date"`
+}
+
+// An array of error levels.
+//
+// The index of the value is the number of the level
+// The value is it's text
+var SeverityArray [4]string = [4]string{
+	"info",
+	"warn",
+	"error",
+	"fatal",
 }

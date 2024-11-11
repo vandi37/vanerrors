@@ -5,10 +5,12 @@ import (
 	"log"
 )
 
-// Logs the error
+// Creates a log of VanError based on it settings
 //
-// a method for the vanError
-func (e VanError) Log() error {
+// The method could be used inside some methods (New(), VanError.Error()) and outside
+// err := Default(Name, Message, Code, Logger)
+// err.Log()
+func (e VanError) Log() {
 	// Setting the logger output
 	options := e.LoggerOptions
 	var result string
@@ -60,6 +62,4 @@ func (e VanError) Log() error {
 		logger.Fatalln(result)
 	}
 	logger.Println(result)
-
-	return nil
 }

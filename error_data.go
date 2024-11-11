@@ -50,3 +50,22 @@ type ErrorData struct {
 	// and not recommended using the level 0. it is not a logger package!!!
 	Severity int `json:"severity"`
 }
+
+// 	Creates default ErrorData
+//
+// errData := DefaultData(Name, Message, Code, Logger)
+//
+// It does not provide customization, only name, message, code and logger
+// However if you can edit the data
+// errData.Severity = 3
+//
+// Use it to add default settings and then add more error info
+func DefaultData(Name string, Message string, Code int, Logger io.Writer) ErrorData {
+	return ErrorData{
+		Name:     Name,
+		Message:  Message,
+		Code:     Code,
+		Logger:   Logger,
+		Severity: 2,
+	}
+}
