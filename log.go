@@ -10,6 +10,9 @@ import (
 // The method could be used inside some methods (New(), VanError.Error()) and outside
 // err := Default(Name, Message, Code, Logger)
 // err.Log()
+//
+// It is a basic logger, using the standard log package
+// If you want to have better log, set logs of.
 func (e VanError) Log() {
 	// Setting the logger output
 	options := e.LoggerOptions

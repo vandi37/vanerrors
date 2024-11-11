@@ -41,7 +41,7 @@ type ErrorData struct {
 	Logger io.Writer `json:"logger"`
 	/// The error level
 	//
-	// 0 for info level
+	// 0 for info level (It would not work, using any function that connects with New will set it default 2)
 	// 1 for warning level
 	// 2 for error level (almost the same as warn, but better in development mode)
 	// 3 for fatal level (will stop the program)
@@ -49,23 +49,4 @@ type ErrorData struct {
 	// recommended to use level 2 (in development), level 1 (in production) for error situations and level 3 in fatal situations
 	// and not recommended using the level 0. it is not a logger package!!!
 	Severity int `json:"severity"`
-}
-
-// 	Creates default ErrorData
-//
-// errData := DefaultData(Name, Message, Code, Logger)
-//
-// It does not provide customization, only name, message, code and logger
-// However if you can edit the data
-// errData.Severity = 3
-//
-// Use it to add default settings and then add more error info
-func DefaultData(Name string, Message string, Code int, Logger io.Writer) ErrorData {
-	return ErrorData{
-		Name:     Name,
-		Message:  Message,
-		Code:     Code,
-		Logger:   Logger,
-		Severity: 2,
-	}
 }

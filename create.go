@@ -11,7 +11,7 @@ import (
 // sets default:
 // 1. Name == "" -> "unknown error"
 // 2. Code <= 0 -> 500
-// 3. Severity < 0 | Severity > 3 -> 2
+// 3. Severity <= 0 | Severity > 3 -> 2
 
 // It is the most customizable function
 // You can edit the error data, options and log options
@@ -25,7 +25,7 @@ func New(errorData ErrorData, options Options, loggerOptions LoggerOptions) VanE
 	if errorData.Code <= 0 {
 		errorData.Code = 500
 	}
-	if errorData.Severity < 0 || errorData.Severity > 3 {
+	if errorData.Severity <= 0 || errorData.Severity > 3 {
 		errorData.Severity = 2
 	}
 	// Creating a vanError
@@ -53,29 +53,35 @@ func New(errorData ErrorData, options Options, loggerOptions LoggerOptions) VanE
 // Returns default values for New
 //
 // You can use it
-// err := New(DefaultValues(Name, Message, Code, Logger))
+// err := New(DefaultValues(errorData))
 //
 // It does not provide any customization, it only sets default values
 // If you want to have more settings use other methods
-func DefaultValues(Name string, Message string, Code int, Logger io.Writer) (ErrorData, Options, LoggerOptions) {
-	return DefaultData(
-		Name,
-		Message,
-		Code,
-		Logger,
-	), DefaultOptions, DefaultLoggerOptions
+func DefaultValues(errorData ErrorData) (ErrorData, Options, LoggerOptions) {
+	return errorData, DefaultOptions, DefaultLoggerOptions
 }
 
-// Returns default value of VanError
-//
-// You can use it instead of
-// err := New(DefaultValues(Name, Message, Code, Logger))
-// // only
-// err = Default(Name, Message, Code, Logger)
-func Default(Name string, Message string, Code int, Logger io.Writer) VanError {
-	return New(DefaultValues(Name, Message, Code, Logger))
-}
-
+// Creates a new default error
+// With any error data in error data
+// It does the same as
+// err := New(DefaultValues(errorData))
 func NewDefault(errorData ErrorData) VanError {
 	return New(errorData, DefaultOptions, DefaultLoggerOptions)
+}
+
+// Creates a new error only with name and logger
+// If you don't need the logger set it to nil
+func NewName(Name string, Logger io.Writer) VanError {
+	data, opt, logOpt := DefaultValues(ErrorData{Name: Name, Logger: Logger})
+	opt.ShowCode = false
+	opt.ShowMessage = false
+	return New(data, opt, logOpt)
+}
+
+// Creates a new error with pair Name: Message
+// If you don't need the logger set it to nil
+func NewBasic(Name string, Message string, Logger io.Writer) VanError {
+	data, opt, logOpt := DefaultValues(ErrorData{Name: Name, Message: Message, Logger: Logger})
+	opt.ShowCode = false
+	return New(data, opt, logOpt)
 }

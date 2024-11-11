@@ -2,7 +2,6 @@ package vanerrors
 
 // Logger error options
 //
-//
 // it describes the behavior of logging the error
 //
 // You can save base options into a .json file for same settings
