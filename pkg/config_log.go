@@ -21,7 +21,7 @@ func (l logData) String(op LoggerOptions) string {
 	if op.ShowDescription {
 		result += " " + l.Description
 	}
-	if op.ShowCause {
+	if op.ShowCause && l.Cause != nil {
 		result += " " + l.Cause.Error()
 	}
 	return result
