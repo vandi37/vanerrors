@@ -13,14 +13,14 @@ var DefaultOptions Options = Options{
 }
 
 var DefaultLoggerOptions LoggerOptions = LoggerOptions{
-	DoLog: false,
-}
-
-var EmptyLoggerOptions LoggerOptions = LoggerOptions{
 	DoLog:           true,
 	ShowMessage:     true,
 	ShowCode:        true,
 	ShowSeverity:    true,
 	ShowDescription: true,
 	ShowCause:       true,
+}
+
+var EmptyLoggerOptions LoggerOptions = LoggerOptions{
+	DoLog: false,
 }
