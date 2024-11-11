@@ -61,7 +61,7 @@ func Log(vanError VanError) error {
 	}
 
 	// Getting the result string
-	logger := log.New(vanError.logger, "", log.LstdFlags|log.Llongfile|log.Llongfile)
+	logger := log.New(vanError.logger, "", log.LstdFlags|log.Llongfile|log.Lshortfile)
 	if vanError.LoggerOptions.LogWith {
 		result, err := json.Marshal(data)
 		if err != nil {
