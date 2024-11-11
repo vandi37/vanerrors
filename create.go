@@ -15,6 +15,10 @@ import (
 // Name == "" -> "unknown error"
 // Code <= 0 -> 500
 // Severity < 0 | Severity > 3 -> 2
+//
+// # Does not check other values
+//
+// Returns: VanError
 func New(errorData ErrorData, options Options, loggerOptions LoggerOptions) VanError {
 	// Validating name
 	if errorName := strings.TrimSpace(errorData.Name); errorName == "" {
@@ -43,7 +47,7 @@ func New(errorData ErrorData, options Options, loggerOptions LoggerOptions) VanE
 	}
 	// Logging if it needs to be when created
 	if loggerOptions.DoLog && !loggerOptions.LogBy && errorData.Logger != nil {
-		Log(vanError)
+		vanError.Log()
 	}
 
 	return vanError

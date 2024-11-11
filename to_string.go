@@ -61,7 +61,7 @@ func (e VanError) Error() string {
 
 	// Logging if it needs to be when created
 	if e.LoggerOptions.DoLog && !e.LoggerOptions.LogBy && e.logger != nil {
-		Log(e)
+		e.Log()
 	}
 
 	return err

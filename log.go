@@ -7,41 +7,41 @@ import (
 
 // Logs the error
 //
-// vanError - a VanError, which we are going to log
-func Log(vanError VanError) error {
+// a method for the vanError
+func (e VanError) Log() error {
 	// Setting the logger output
-	options := vanError.LoggerOptions
+	options := e.LoggerOptions
 	var result string
 
 	// Adding severity
 	if options.ShowSeverity {
 		if options.IntSeverity {
-			result += "level: " + SeverityArray[vanError.Severity] + ","
+			result += "level: " + SeverityArray[e.Severity] + ","
 		} else {
-			result += fmt.Sprintf("level: %d,", vanError.Severity)
+			result += fmt.Sprintf("level: %d,", e.Severity)
 		}
 	}
 
 	// Adding code
 	if options.ShowCode {
-		result += fmt.Sprintf(" %d", vanError.Code)
+		result += fmt.Sprintf(" %d", e.Code)
 	}
 
 	// Adding name
-	result += " " + vanError.Name
+	result += " " + e.Name
 
 	// Adding message
 	if options.ShowMessage {
-		result += ": " + vanError.Message
+		result += ": " + e.Message
 	}
 
 	// Adding , to show the next data
 	result += ", "
 
 	// Adding description
-	if options.ShowDescription && vanError.Description != nil {
+	if options.ShowDescription && e.Description != nil {
 		description := make([]byte, 4096)
-		n, err := vanError.Description.Read(description)
+		n, err := e.Description.Read(description)
 		if err == nil {
 			description = description[:n]
 		}
@@ -50,13 +50,13 @@ func Log(vanError VanError) error {
 	}
 
 	// Adding cause
-	if options.ShowCause && vanError.Cause != nil {
-		result += "cause: " + vanError.Cause.Error()
+	if options.ShowCause && e.Cause != nil {
+		result += "cause: " + e.Cause.Error()
 	}
 
 	// Getting the result string
-	logger := log.New(vanError.logger, "", log.LstdFlags|log.Llongfile|log.Lshortfile)
-	if vanError.Severity == 3 {
+	logger := log.New(e.logger, "", log.LstdFlags|log.Llongfile|log.Lshortfile)
+	if e.Severity == 3 {
 		logger.Fatalln(result)
 	}
 	logger.Println(result)
