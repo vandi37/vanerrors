@@ -1,4 +1,4 @@
-package vanerrors
+package main
 
 // The error options
 //
