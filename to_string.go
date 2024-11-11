@@ -59,5 +59,10 @@ func (e VanError) Error() string {
 		err += "cause: " + e.Cause.Error()
 	}
 
+	// Logging if it needs to be when created
+	if e.LoggerOptions.DoLog && !e.LoggerOptions.LogBy && e.logger != nil {
+		Log(e)
+	}
+
 	return err
 }
