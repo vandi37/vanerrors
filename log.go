@@ -1,4 +1,4 @@
-package main
+package vanerrors
 
 import (
 	"encoding/json"

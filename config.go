@@ -1,4 +1,4 @@
-package main
+package vanerrors
 
 var SeverityArray [4]string = [4]string{
 	"info",
