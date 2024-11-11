@@ -75,3 +75,7 @@ func DefaultValues(Name string, Message string, Code int, Logger io.Writer) (Err
 func Default(Name string, Message string, Code int, Logger io.Writer) VanError {
 	return New(DefaultValues(Name, Message, Code, Logger))
 }
+
+func NewDefault(errorData ErrorData) VanError {
+	return New(errorData, DefaultOptions, DefaultLoggerOptions)
+}
