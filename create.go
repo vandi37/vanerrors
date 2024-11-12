@@ -9,9 +9,9 @@ import (
 // Creates a new VanError
 //
 // sets default:
-// 1. Name == "" -> "unknown error"
-// 2. Code <= 0 -> 500
-// 3. Severity <= 0 | Severity > 3 -> 2
+// 1. Name == "" -> "unknown error",
+// 2. Code <= 0 -> 500,
+// 3. Severity <= 0 or Severity > 3 -> 2,
 
 // It is the most customizable function
 // You can edit the error data, options and log options
