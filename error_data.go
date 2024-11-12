@@ -22,11 +22,6 @@ type ErrorData struct {
 	Code int `json:"code"`
 	// The error, because of what this error was created
 	//
-	// example:
-	// if err != nil {
-	//		panic(VanError{Cause: err})
-	// }
-	//
 	// it would not be used on .Error() func, however you will see in logs it
 	Cause error `json:"error"`
 	// The error description

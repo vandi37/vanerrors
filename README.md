@@ -39,6 +39,22 @@ err := vanerrors.NewBasic("readme error", "here could be the error message", nil
 fmt.Println(err.Error()) // "readme error: here could be the error message"
 ```
 
+You can also use an http format
+
+### HTTP parameters 
+```go
+err := vanerrors.NewHTTP("readme error", 500, nil) // nil is here also a empty logger
+fmt.Println(err.Error()) // "500 readme error"
+```
+
+Or you can add a cause error
+
+### Cause parameter 
+```go
+err := vanerrors.NewHTTP("readme error", errors.New("some cause"), nil) // nil is here also a empty logger
+fmt.Println(err.Error()) // "readme error" (the cause will be in the error, but not shown)
+```
+
 Do you want a more advanced method? Here:
 
 ### ErrorData
@@ -274,3 +290,7 @@ func GetError() error {
 }
 ```
 Use it to get special data of the error
+
+## License
+
+[MIT](LICENSE)

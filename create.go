@@ -85,3 +85,20 @@ func NewBasic(Name string, Message string, Logger io.Writer) VanError {
 	opt.ShowCode = false
 	return New(data, opt, logOpt)
 }
+
+// Creates a new error with pair Code Name
+// If you don't need the logger set it to nil
+func NewHTTP(Name string, Code int, Logger io.Writer) VanError {
+	data, opt, logOpt := DefaultValues(ErrorData{Name: Name, Code: Code, Logger: Logger})
+	opt.ShowMessage = false
+	return New(data, opt, logOpt)
+}
+
+// Creates a new error with Name, and error that is the error cause (it would not be shown it .Error())
+// If you don't need the logger set it to nil
+func NewChild(Name string, Cause error, Logger io.Writer) VanError {
+	data, opt, logOpt := DefaultValues(ErrorData{Name: Name, Cause: Cause, Logger: Logger})
+	opt.ShowMessage = false
+	opt.ShowCode = false
+	return New(data, opt, logOpt)
+}
