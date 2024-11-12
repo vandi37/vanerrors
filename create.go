@@ -36,7 +36,7 @@ func New(errorData ErrorData, options Options, loggerOptions LoggerOptions) VanE
 		Code:          errorData.Code,
 		Cause:         errorData.Cause,
 		Description:   errorData.Description,
-		logger:        errorData.Logger,
+		Logger:        errorData.Logger,
 		LoggerOptions: loggerOptions,
 		Options:       options,
 		Severity:      errorData.Severity,

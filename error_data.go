@@ -41,7 +41,6 @@ type ErrorData struct {
 	Logger io.Writer `json:"logger"`
 	/// The error level
 	//
-	// 0 for info level (It would not work, using any function that connects with New will set it default 2)
 	// 1 for warning level
 	// 2 for error level (almost the same as warn, but better in development mode)
 	// 3 for fatal level (will stop the program)

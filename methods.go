@@ -62,22 +62,11 @@ func (e VanError) Error() string {
 		}
 	}
 	// Logging if it needs to be when called
-	if e.LoggerOptions.DoLog && e.LoggerOptions.LogBy && e.logger != nil {
+	if e.LoggerOptions.DoLog && e.LoggerOptions.LogBy && e.Logger != nil {
 		e.Log()
 	}
 
 	return err
-}
-
-// Checks is the target is the same as the vanError
-// It does check date, description and log data (log options and logger)
-func (e VanError) Is(target error) bool {
-	vanTarget := Get(target)
-	if vanTarget == nil {
-		return false
-	}
-	return vanTarget.Code == e.Code && vanTarget.Name == e.Name && e.Options == vanTarget.Options && vanTarget.Severity == e.Severity
-
 }
 
 // Checks is the target a VanError
@@ -92,20 +81,12 @@ func (e VanError) As(target any) bool {
 }
 
 // Unwraps the most deep error in the VanError error stack
-func (e VanError) UnwrapOne() error {
-	var err error
-	err = e
-	for {
-		if getErr := Get(err); getErr != nil {
-			err = getErr.Cause
-		} else {
-			return err
-		}
-	}
+func (e VanError) Unwrap() error {
+	return e.Cause
 }
 
 // Gets all errors in the VanError error stack
-func (e VanError) Unwrap() []error {
+func (e VanError) UnwrapAll() []error {
 	var allErrors []error
 	var err error
 	err = e
@@ -123,6 +104,17 @@ func (e VanError) Unwrap() []error {
 	}
 
 	return allErrors
+}
+
+// Checks is the target is the same as the vanError
+// It does check date, description and log data (log options and logger)
+func (e VanError) Is(target error) bool {
+	vanTarget := Get(target)
+	if vanTarget == nil {
+		return false
+	}
+	return vanTarget.Code == e.Code && vanTarget.Name == e.Name && e.Options == vanTarget.Options && vanTarget.Severity == e.Severity
+
 }
 
 // Gets the VanError if the error is it
