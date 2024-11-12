@@ -65,7 +65,7 @@ func (e VanError) Log() {
 	}
 
 	// Getting the result string
-	logger := log.New(e.Logger, "", log.LstdFlags|log.Llongfile|log.Lshortfile)
+	logger := log.New(e.Logger, "", log.LstdFlags|log.Llongfile)
 	if e.Severity == 3 {
 		logger.Panicln(result)
 	}
