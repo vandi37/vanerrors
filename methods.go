@@ -122,9 +122,9 @@ func (e VanError) Is(target error) bool {
 // if error is a van error returns the van error
 // if error is nol a van error returns nil
 func Get(target error) *VanError {
-	vanErr, ok := target.(*VanError)
+	vanErr, ok := target.(VanError)
 	if !ok {
 		return nil
 	}
-	return vanErr
+	return &vanErr
 }

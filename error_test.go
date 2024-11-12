@@ -417,3 +417,12 @@ func TestNew_Panic_On_Log(t *testing.T) {
 		Logger:   &logWriter,
 	}, vanerrors.DefaultOptions, vanerrors.EmptyLoggerOptions).Log()
 }
+
+func TestGetName(t *testing.T) {
+	err := vanerrors.NewName("only name", nil)
+	name := "only name"
+	gotName := vanerrors.GetName(err)
+	if name != gotName {
+		t.Errorf("error names are different: expect: %s, got %s", name, gotName)
+	}
+}
