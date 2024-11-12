@@ -291,6 +291,9 @@ func GetError() error {
 ```
 Use it to get special data of the error
 
-## License
+
+## Other information 
+
+### License
 
 [MIT](LICENSE)
