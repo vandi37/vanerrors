@@ -19,45 +19,50 @@ func (e VanError) Error() string {
 	// Adding severity
 	if options.ShowSeverity {
 		if options.IntSeverity {
-			err += "level: " + SeverityArray[e.Severity] + ","
+			err += "level: " + SeverityArray[e.Severity] + ", "
 		} else {
-			err += fmt.Sprintf("level: %d,", e.Severity)
+			err += fmt.Sprintf("level: %d, ", e.Severity)
 		}
 	}
 
 	// Adding code
 	if options.ShowCode {
-		err += fmt.Sprintf(" %d", e.Code)
+		err += fmt.Sprintf("%d ", e.Code)
 	}
 
 	// Adding name
-	err += " " + e.Name
+	err += e.Name
 
 	// Adding message
 	if options.ShowMessage {
 		err += ": " + e.Message
 	}
-	// Adds ", "
-	err += ", "
 
-	// Adding description
-	if options.ShowDescription && e.Description != nil {
-		description := make([]byte, 4096)
-		n, errRead := e.Description.Read(description)
-		if errRead == nil {
-			description = description[:n]
+	if options.ShowDescription || options.ShowCause {
+		// Adds ", "
+		err += ", "
+
+		// Adding description
+		if options.ShowDescription && e.Description != nil {
+			description := make([]byte, 4096)
+			n, errRead := e.Description.Read(description)
+			if errRead == nil {
+				description = description[:n]
+			}
+
+			err += "description: " + string(description)
+			if options.ShowCause {
+				err += ", "
+			}
 		}
 
-		err += "description: " + string(description) + ", "
+		// Adding cause
+		if options.ShowCause && e.Cause != nil {
+			err += "cause: " + e.Cause.Error()
+		}
 	}
-
-	// Adding cause
-	if options.ShowCause && e.Cause != nil {
-		err += "cause: " + e.Cause.Error()
-	}
-
-	// Logging if it needs to be when created
-	if e.LoggerOptions.DoLog && !e.LoggerOptions.LogBy && e.logger != nil {
+	// Logging if it needs to be when called
+	if e.LoggerOptions.DoLog && e.LoggerOptions.LogBy && e.logger != nil {
 		e.Log()
 	}
 
