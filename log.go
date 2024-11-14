@@ -20,7 +20,7 @@ func (e VanError) Log() {
 
 	// Adding severity
 	if options.ShowSeverity {
-		if options.IntSeverity {
+		if !options.IntSeverity {
 			result += "level: " + SeverityArray[e.Severity] + ", "
 		} else {
 			result += fmt.Sprintf("level: %d, ", e.Severity)
@@ -65,7 +65,7 @@ func (e VanError) Log() {
 	}
 
 	// Getting the result string
-	logger := log.New(e.Logger, "", log.LstdFlags|log.Llongfile)
+	logger := log.New(e.Logger, "", log.LstdFlags)
 	if e.Severity == 3 {
 		logger.Panicln(result)
 	}

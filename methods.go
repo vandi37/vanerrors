@@ -13,12 +13,12 @@ func (e VanError) Error() string {
 
 	// Adding data
 	if options.ShowDate {
-		err += e.Date.Format("2006-01-02 15:04:05 ")
+		err += e.Date.Format("2006/01/02 15:04:05 ")
 	}
 
 	// Adding severity
 	if options.ShowSeverity {
-		if options.IntSeverity {
+		if !options.IntSeverity {
 			err += "level: " + SeverityArray[e.Severity] + ", "
 		} else {
 			err += fmt.Sprintf("level: %d, ", e.Severity)
