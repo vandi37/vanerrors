@@ -13,29 +13,26 @@ It has:
 
 ## How to install the package
 
-It's simple. 
-Just Write this into the console with your project.
 ```bash
 go get github.com/VandiKond/vanerrors
 ```
 
-
 ## How to use?
 
 So, how to use your vanerrors?
-It is simple. you can create a error only with a name 
+It is simple. you can create an error only with a name 
 
 ### Start with name
 ```go
-err := vanerrors.NewName("readme error", nil) // you can ad a io.Writer instead of nil, it will be your logger
-fmt.Println(err.Error()) // "readme error"
+err := vanerrors.NewName("readme error", nil) // you can add an io.Writer instead of nil, it will be your logger
+fmt. Println(err.Error()) // "readme error"
 ```
 
 If you want to add more information, for example message, you can do like this:
 
 ### Basic parameters  
 ```go
-err := vanerrors.NewBasic("readme error", "here could be the error message", nil) // nil is here also a empty logger
+err := vanerrors.NewBasic("readme error", "here could be the error message", nil) // nil is here also an empty logger
 fmt.Println(err.Error()) // "readme error: here could be the error message"
 ```
 
@@ -43,7 +40,7 @@ You can also use an http format
 
 ### HTTP parameters 
 ```go
-err := vanerrors.NewHTTP("readme error", 500, nil) // nil is here also a empty logger
+err := vanerrors.NewHTTP("readme error", 500, nil) // nil is here also an empty logger
 fmt.Println(err.Error()) // "500 readme error"
 ```
 
@@ -51,8 +48,8 @@ Or you can add a cause error
 
 ### Cause parameter 
 ```go
-err := vanerrors.NewHTTP("readme error", errors.New("some cause"), nil) // nil is here also a empty logger
-fmt.Println(err.Error()) // "readme error" (the cause will be in the error, but not shown)
+err := vanerrors.NewWrap("readme error", errors.New("some cause"), nil) // nil is here also an empty logger
+fmt.Println(err.Error()) // "readme error, cause: some cause"
 ```
 
 Do you want a more advanced method? Here:
@@ -71,10 +68,10 @@ err := vanerrors.NewDefault(vanerrors.ErrorData{
 fmt.Println(err.Error()) // "500 readme error: here could be the error message" (other information wasn't shown because of the show settings)
 ```
 
-So in this example for some reason not all data was printed.
-Why? We've added it to the error settings, so why it is not printed
+So, in this example for some reason not all data was printed.
+Why? I've added it to the error settings, so why it is not printed
 
-It is since the display options by default display only code, name, message. Other data is still in the error. You can edit this settings
+It is since the display options with default settings display only code, name, message. Other data is still in the error. You can edit these settings
 
 ### Display Options
 ```go
@@ -100,10 +97,9 @@ err := vanerrors.New(vanerrors.ErrorData{
 fmt.Println(err.Error()) // "2006-01-02 15:04:05 level: 2, 500 readme error: here could be the error message, description: you can add more information here. the more - the better, cause: some cause error"
 ```
 
-If some value is false you can skip it, because go automatically sets bool parameters to false. 
-If you skip one of the values it would be marked as false
+If some value is false, you can’t add it to the list, automatically it would be marked as false.
 
-So I've mentioned log settings. How to use it?:
+So, I've mentioned log settings. How to use them?
 
 ### LoggerOptions
 ```go
@@ -133,39 +129,23 @@ err := vanerrors.New(vanerrors.ErrorData{
 err.Error() // "2006-01-02 15:04:05 level: 2, 500 readme error: here could be the error message, description: you can add more information here. the more - the better, cause: some cause error" 
 ```
 
-So now you can say that it is to complicated? Yes it is!
+So now it is too complicated? 
 
-This is why i've added 3 variables for default recommended values. 
-One i've already shown you: it is empty logger options
+This is why I’ve added 3 variables for default recommended values. 
+One I’ve already shown you: it is empty logger options
 
 ### EmptyLoggerOptions
 ```go
 opt := vanerrors.EmptyLoggerOptions
 opt.ShowMessage = true // Enable the message
 ```
-Yea it's just 
-```go
-var EmptyLoggerOptions LoggerOptions = LoggerOptions{}
-```
-However who cares?
 
-The next one is also for logger options, however it has a lot of enabled values, that i recommend to leave enabled
+The next one is also for logger options. They have a lot more of enabled values, that I recommend to leave enabled
 
 ### DefaultLoggerOptions 
 ```go
 opt := vanerrors.DefaultLoggerOptions
 opt.ShowCause = false // Disable the cause
-```
-So it is more complicated:
-```go
-var DefaultLoggerOptions LoggerOptions = LoggerOptions{
-	DoLog:           true,
-	ShowMessage:     true,
-	ShowCode:        true,
-	ShowSeverity:    true,
-	ShowDescription: true,
-	ShowCause:       true,
-}
 ```
 
 And the last one. It's the same but for options
@@ -175,36 +155,33 @@ And the last one. It's the same but for options
 opt := vanerrors.DefaultOptions
 opt.ShowSeverity = true // Enable the severity
 ```
-It has only two default values
-```go
-var DefaultOptions Options = Options{
-	ShowMessage: true,
-	ShowCode:    true,
-}
-```
 
-Okay. So we know how to create an error, edit settings.
-Lets get  the information about it!
+Okay. So, we know how to create an error, edit settings.
+Let’s get  the information about it!
 
 ### Error Information 
 ```go
 err := vanerrors.NewBasic("readme error", "here could be the error message", nil)
 errorText := err.Error()
+fmt.Println(errorText) // "readme error: here could be the error message"
 ```
-So actually it just shows the error
+
+So actually, it just shows the error
 
 And what about logs? We can make the program show the log by creating and calling the error.
-Bu what about Logging the error when you want?
+But what about Logging the error when you want?
+
 ### Log error
 ```go
 err := vanerrors.NewBasic("readme error", "here could be the error message", nil)
-err.Log()  // "2006-01-02 15:04:05 level: 2, 500 readme error: here could be the error message" (other info not shown because it is empty)
+err.Log()  // "2006/01/02 15:04:05 level: 2, 500 readme error: here could be the error message" (other info not shown because it is empty)
 ```
+
 So now you can log the error when you want
 
 Now about other methods:
 
-### Methods for other interfaces (for instance errors package)
+### Methods (for instance for interfaces in errors package)
 ```go
 err := vanerrors.NewBasic("readme error", "here could be the error message", nil)
 
@@ -242,7 +219,7 @@ fmt.Println(Get(GetOtherError)) // nil
 ```
 Now you can do more operations with the error
 
-Now, how to get a value from error if you don't know is it a van error and don't wan't to yse Get
+Now, how to get a value from error if you don't know is it a van error and don't want to use Get
 
 ### Getters
 ```go
@@ -256,44 +233,44 @@ func GetError() error {
         Logger: nil, 
         Severity: 2,
     })
-
-    err := GetError()
-    err2 := errors.New("not vandi error")
-
-    // GetName
-    GetName(err) // "readme error"
-    GetName(err2) // ""
-
-    // GetMessage
-    GetMessage(err) // "here could be the error message"
-    GetMessage(err2) // ""
-
-    // GetCode
-    GetCode(err) // 500
-    GetCode(err2) // 0
-
-    // GetSeverityStr
-    GetSeverityStr(err) // "error"
-    GetSeverityStr(err2) // ""
-
-    // GetSeverityInt
-    GetSeverityInt(err) // 2
-    GetSeverityInt(err2) // 0
-
-    // GetDescription
-    GetDescription(err) // bytes.Reader
-    GetDescription(err2) // nil
-
-    // GetDate
-    GetDate(err) // time.Now()
-    GetDate(err2) // nil
 }
+
+err := GetError()
+err2 := errors.New("not vandi error")
+
+// GetName
+GetName(err) // "readme error"
+GetName(err2) // ""
+
+// GetMessage
+GetMessage(err) // "here could be the error message"
+GetMessage(err2) // ""
+
+// GetCode
+GetCode(err) // 500
+GetCode(err2) // 0
+
+// GetSeverityStr
+GetSeverityStr(err) // "error"
+GetSeverityStr(err2) // ""
+
+// GetSeverityInt
+GetSeverityInt(err) // 2
+GetSeverityInt(err2) // 0
+
+// GetDescription
+GetDescription(err) // bytes.Reader
+GetDescription(err2) // nil
+
+// GetDate
+GetDate(err) // time.Now()
+GetDate(err2) // nil
 ```
 Use it to get special data of the error
-
 
 ## Other information 
 
 ### License
 
 [MIT](LICENSE)
+

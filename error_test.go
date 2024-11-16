@@ -41,10 +41,10 @@ func TestNewHTTP(t *testing.T) {
 	}
 }
 
-func TestNewChild(t *testing.T) {
+func TestNewWrap(t *testing.T) {
 	var name = "name"
 	var cause = errors.New("cause")
-	var err = vanerrors.NewChild(name, cause, nil)
+	var err = vanerrors.NewWrap(name, cause, nil)
 	if err.Name != name {
 		t.Fatalf("name don't match, wait '%s', got '%s'", name, err.Name)
 	}
