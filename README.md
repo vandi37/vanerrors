@@ -20,9 +20,10 @@ go get github.com/VandiKond/vanerrors
 ## How to use?
 
 So, how to use your vanerrors?
-It is simple. you can create an error only with a name 
+It is simple. you can create an error only with a name
 
 ### Start with name
+
 ```go
 err := vanerrors.NewName("readme error", nil) // you can add an io.Writer instead of nil, it will be your logger
 fmt. Println(err.Error()) // "readme error"
@@ -31,6 +32,7 @@ fmt. Println(err.Error()) // "readme error"
 If you want to add more information, for example message, you can do like this:
 
 ### Basic parameters  
+
 ```go
 err := vanerrors.NewBasic("readme error", "here could be the error message", nil) // nil is here also an empty logger
 fmt.Println(err.Error()) // "readme error: here could be the error message"
@@ -38,7 +40,8 @@ fmt.Println(err.Error()) // "readme error: here could be the error message"
 
 You can also use an http format
 
-### HTTP parameters 
+### HTTP parameters
+
 ```go
 err := vanerrors.NewHTTP("readme error", 500, nil) // nil is here also an empty logger
 fmt.Println(err.Error()) // "500 readme error"
@@ -46,7 +49,8 @@ fmt.Println(err.Error()) // "500 readme error"
 
 Or you can add a cause error
 
-### Cause parameter 
+### Cause parameter
+
 ```go
 err := vanerrors.NewWrap("readme error", errors.New("some cause"), nil) // nil is here also an empty logger
 fmt.Println(err.Error()) // "readme error, cause: some cause"
@@ -55,6 +59,7 @@ fmt.Println(err.Error()) // "readme error, cause: some cause"
 Do you want a more advanced method? Here:
 
 ### ErrorData
+
 ```go
 err := vanerrors.NewDefault(vanerrors.ErrorData{
     Name: "readme error", // The error name
@@ -74,6 +79,7 @@ Why? I've added it to the error settings, so why it is not printed
 It is since the display options with default settings display only code, name, message. Other data is still in the error. You can edit these settings
 
 ### Display Options
+
 ```go
 err := vanerrors.New(vanerrors.ErrorData{
     Name: "readme error",
@@ -102,6 +108,7 @@ If some value is false, you can’t add it to the list, automatically it would b
 So, I've mentioned log settings. How to use them?
 
 ### LoggerOptions
+
 ```go
 err := vanerrors.New(vanerrors.ErrorData{
     Name: "readme error",
@@ -129,12 +136,13 @@ err := vanerrors.New(vanerrors.ErrorData{
 err.Error() // "2006-01-02 15:04:05 level: 2, 500 readme error: here could be the error message, description: you can add more information here. the more - the better, cause: some cause error" 
 ```
 
-So now it is too complicated? 
+So now it is too complicated?
 
-This is why I’ve added 3 variables for default recommended values. 
+This is why I’ve added 3 variables for default recommended values.
 One I’ve already shown you: it is empty logger options
 
 ### EmptyLoggerOptions
+
 ```go
 opt := vanerrors.EmptyLoggerOptions
 opt.ShowMessage = true // Enable the message
@@ -142,7 +150,8 @@ opt.ShowMessage = true // Enable the message
 
 The next one is also for logger options. They have a lot more of enabled values, that I recommend to leave enabled
 
-### DefaultLoggerOptions 
+### DefaultLoggerOptions
+
 ```go
 opt := vanerrors.DefaultLoggerOptions
 opt.ShowCause = false // Disable the cause
@@ -151,6 +160,7 @@ opt.ShowCause = false // Disable the cause
 And the last one. It's the same but for options
 
 ### DefaultOptions
+
 ```go
 opt := vanerrors.DefaultOptions
 opt.ShowSeverity = true // Enable the severity
@@ -159,7 +169,8 @@ opt.ShowSeverity = true // Enable the severity
 Okay. So, we know how to create an error, edit settings.
 Let’s get  the information about it!
 
-### Error Information 
+### Error Information
+
 ```go
 err := vanerrors.NewBasic("readme error", "here could be the error message", nil)
 errorText := err.Error()
@@ -172,6 +183,7 @@ And what about logs? We can make the program show the log by creating and callin
 But what about Logging the error when you want?
 
 ### Log error
+
 ```go
 err := vanerrors.NewBasic("readme error", "here could be the error message", nil)
 err.Log()  // "2006/01/02 15:04:05 level: 2, 500 readme error: here could be the error message" (other info not shown because it is empty)
@@ -182,6 +194,7 @@ So now you can log the error when you want
 Now about other methods:
 
 ### Methods (for instance for interfaces in errors package)
+
 ```go
 err := vanerrors.NewBasic("readme error", "here could be the error message", nil)
 
@@ -217,11 +230,13 @@ func GetOtherError() error {
 fmt.Println(Get(GetError())) // "readme error: here could be the error message"
 fmt.Println(Get(GetOtherError)) // nil
 ```
+
 Now you can do more operations with the error
 
 Now, how to get a value from error if you don't know is it a van error and don't want to use Get
 
 ### Getters
+
 ```go
 func GetError() error {
     return vanerrors.NewDefault(vanerrors.ErrorData{
@@ -266,11 +281,11 @@ GetDescription(err2) // nil
 GetDate(err) // time.Now()
 GetDate(err2) // nil
 ```
+
 Use it to get special data of the error
 
-## Other information 
+## Other information
 
 ### License
 
 [MIT](LICENSE)
-
