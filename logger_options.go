@@ -67,3 +67,8 @@ var DefaultLoggerOptions LoggerOptions = LoggerOptions{
 //
 // It makes everything off
 var EmptyLoggerOptions LoggerOptions = LoggerOptions{}
+
+// Sets your logger options as default for your program
+func (o LoggerOptions) SetAsDefault() {
+	DefaultLoggerOptions = o
+}
