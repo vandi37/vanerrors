@@ -392,3 +392,36 @@ func TestGet(t *testing.T) {
 		t.Fatalf("got result in get '%s', expected 'name'", VanErrNotNil.Error())
 	}
 }
+
+func TestOptionsSetAsDefault(t *testing.T) {
+	var options = vanerrors.Options{
+		ShowMessage: true,
+	}
+	options.SetAsDefault()
+	if options != vanerrors.DefaultOptions {
+		t.Fatalf("got default options %v, expected %v", vanerrors.DefaultOptions, options)
+	}
+}
+
+func TestLoggerOptionsSetAsDefault(t *testing.T) {
+	var options = vanerrors.LoggerOptions{
+		ShowMessage: true,
+	}
+	options.SetAsDefault()
+	if options != vanerrors.DefaultLoggerOptions {
+		t.Fatalf("got default logger options %v, expected %v", vanerrors.DefaultLoggerOptions, options)
+	}
+}
+
+func TestErrorW(t *testing.T) {
+	var errorW = vanerrors.NewW(
+		vanerrors.Options{
+			ShowMessage: true,
+		},
+		vanerrors.EmptyLoggerOptions,
+	)
+	err := errorW.NewBasic("name", "message", nil)
+	if err.Error() != "name: message" {
+		t.Fatalf("got error %s, expected name: message", err.Error())
+	}
+}

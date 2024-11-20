@@ -48,3 +48,8 @@ var DefaultOptions Options = Options{
 	ShowMessage: true,
 	ShowCode:    true,
 }
+
+// Sets your options as default for your program
+func (o Options) SetAsDefault() {
+	DefaultOptions = o
+}
