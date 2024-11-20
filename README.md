@@ -166,6 +166,31 @@ opt := vanerrors.DefaultOptions
 opt.ShowSeverity = true // Enable the severity
 ```
 
+You don't like default options?
+
+### Setting Options and LoggerOptions as default
+
+```go
+options := vanerrors.Options{
+    ShowCause: true,
+}
+
+// Setting options as default
+options.SetAsDefault()
+
+fmt.Println(vanerrors.DefaultOptions.ShowCause) // true
+
+loggerOptions := vanerrors.LoggerOptions{
+    LogBy: true,
+}
+
+// Setting logger options as default
+loggerOptions.SetAsDefault()
+
+fmt.Println(vanerrors.DefaultLoggerOptions.LogBy) // true
+
+```
+
 Okay. So, we know how to create an error, edit settings.
 Let’s get  the information about it!
 
