@@ -191,6 +191,26 @@ fmt.Println(vanerrors.DefaultLoggerOptions.LogBy) // true
 
 ```
 
+So now you can set default options to anything you want
+What about a error writer, that does not depends on default settings
+
+### ErrorW (error writer)
+
+```go
+errorW := vanerrors.NewW(
+    vanerrors.Options{
+        ShowMessage: true,
+    },
+    vanerrors.EmptyLoggerOptions,
+)
+
+// You can use any create methods (New, NewName, NewBasic, NewHTTP, NewWrap)
+
+// Example with basic 
+err := errorW.NewBasic("readme error", "here could be the error message", nil) 
+fmt.Println(err.Error()) // "readme error: here could be the error message"
+```
+
 Okay. So, we know how to create an error, edit settings.
 Let’s get  the information about it!
 

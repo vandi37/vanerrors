@@ -7,9 +7,9 @@ import "io"
 // has it own settings for not using default
 type ErrorW struct {
 	// OPtions
-	Options Options
+	Options Options `json:"options"`
 	// LoggerOptions
-	LoggerOptions LoggerOptions
+	LoggerOptions LoggerOptions `json:"logger_options"`
 }
 
 // Creates a Error Writer
