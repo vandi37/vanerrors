@@ -203,7 +203,7 @@ func TestLogger(t *testing.T) {
 	}
 	_ = vanerrors.NewDefault(data)
 
-	expectedOutput := time.Now().Format("2006/01/02 15:04:05") + " level: error, 400 name: message, description: description, cause: cause\n"
+	expectedOutput := time.Now().Format("2006/01/02 15:04:05") + " error, 400 name: message, description: description, cause: cause\n"
 	if logger.String() != expectedOutput {
 		t.Fatalf("log output don't match, wait '%s', got '%s'", expectedOutput, logger.String())
 	}
@@ -225,7 +225,7 @@ func TestLoggerOnError(t *testing.T) {
 	}
 	var err = vanerrors.New(data, vanerrors.DefaultOptions, logger_options)
 	_ = err.Error()
-	expectedOutput := time.Now().Format("2006/01/02 15:04:05") + " level: error, 400 name: message, description: description, cause: cause\n"
+	expectedOutput := time.Now().Format("2006/01/02 15:04:05") + " error, 400 name: message, description: description, cause: cause\n"
 	if logger.String() != expectedOutput {
 		t.Fatalf("log output don't match, wait '%s', got '%s'", expectedOutput, logger.String())
 	}
@@ -247,7 +247,7 @@ func TestLoggerOnLog(t *testing.T) {
 	}
 	var err = vanerrors.New(data, vanerrors.DefaultOptions, logger_options)
 	err.Log()
-	expectedOutput := time.Now().Format("2006/01/02 15:04:05") + " level: error, 400 name: message, description: description, cause: cause\n"
+	expectedOutput := time.Now().Format("2006/01/02 15:04:05") + " error, 400 name: message, description: description, cause: cause\n"
 	if logger.String() != expectedOutput {
 		t.Fatalf("log output don't match, wait '%s', got '%s'", expectedOutput, logger.String())
 	}
@@ -337,7 +337,7 @@ func TestError(t *testing.T) {
 	}
 	var err = vanerrors.New(data, options, vanerrors.DefaultLoggerOptions)
 	var got = err.Error()
-	expectedOutput := time.Now().Format("2006/01/02 15:04:05") + " level: error, 400 name: message, description: description, cause: cause"
+	expectedOutput := time.Now().Format("2006/01/02 15:04:05") + " error, 400 name: message, description: description, cause: cause"
 	if got != expectedOutput {
 		t.Fatalf("error output don't match, wait '%s', got '%s'", expectedOutput, got)
 	}
@@ -423,5 +423,16 @@ func TestErrorW(t *testing.T) {
 	err := errorW.NewBasic("name", "message", nil)
 	if err.Error() != "name: message" {
 		t.Fatalf("got error %s, expected name: message", err.Error())
+	}
+}
+
+func TestTouch(t *testing.T) {
+	err := vanerrors.NewName("name", nil)
+	bufErr := err
+
+	err.Touch("touch")
+
+	if !errors.Is(err.Unwrap(), bufErr) {
+		t.Fatalf("error out of the wrap is not the original error")
 	}
 }

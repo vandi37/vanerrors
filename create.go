@@ -24,6 +24,7 @@ func New(errorData ErrorData, options Options, loggerOptions LoggerOptions) VanE
 	// Validating code
 	if errorData.Code <= 0 {
 		errorData.Code = 500
+		options.ShowCode = false
 	}
 	if errorData.Severity <= 0 || errorData.Severity > 3 {
 		errorData.Severity = 2

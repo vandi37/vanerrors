@@ -65,26 +65,34 @@ func NewStack() VanStack {
 
 // Ads a call to the stack
 func (s *VanStack) Add(call Call) {
-	var bufStack = NewStack()
-	bufStack = append(bufStack, call)
-	bufStack = append(bufStack, *s...)
-	*s = bufStack
+	*s = append([]Call{call}, *s...)
 }
 
-// Gets the last added call
-func (s VanStack) GetLastCall() Call {
-	return s[0]
-}
-
-// Gets the first added call
-func (s VanStack) GetFirstCall() Call {
-	return s[len(s)-1]
+// Fils the stack
+func (s *VanStack) Fill(name string, n int) {
+	for i := 1; i <= n; i++ {
+		pc, file, line, ok := runtime.Caller(i)
+		if !ok {
+			break
+		}
+		runtimeFunc := runtime.FuncForPC(pc)
+		var pathSlice = strings.Split(file, "/")
+		var shortPath = pathSlice[len(pathSlice)-1]
+		s.Add(&VanCall{
+			path: fmt.Sprintf("%s %v: %d", shortPath, runtimeFunc.Name(), line),
+			date: time.Now(),
+			Name: fmt.Sprintf("%s %d", name, len(*s)),
+		})
+	}
 }
 
 // Gets the period when the were the last and the first call
-func (s VanStack) GetStackPeriod() time.Duration {
-	var LastCall time.Time = s.GetLastCall().GetDate()
-	var FirstCall time.Time = s.GetFirstCall().GetDate()
+func (s VanStack) Period() time.Duration {
+	if len(s) <= 1 {
+		return 0
+	}
+	var LastCall time.Time = s[0].GetDate()
+	var FirstCall time.Time = s[len(s)-1].GetDate()
 	for _, c := range s {
 		if c.GetDate().Before(LastCall) {
 			LastCall = c.GetDate()
@@ -138,10 +146,12 @@ type StackError struct {
 	Err error
 	// a stack
 	Stack VanStack
+	// Do you need to show the stack
+	ShowStack bool
 }
 
 func (e StackError) Error() string {
-	if len(e.Stack) > 0 {
+	if len(e.Stack) > 0 && e.ShowStack {
 		return e.Err.Error() + ", stack: " + e.Stack.ToString()
 	}
 	return e.Err.Error()
@@ -150,8 +160,9 @@ func (e StackError) Error() string {
 // Makes from the error a stack error
 func ToStackError(err error) StackError {
 	result := StackError{
-		Err:   err,
-		Stack: NewStack(),
+		Err:       err,
+		Stack:     NewStack(),
+		ShowStack: true,
 	}
 	return result
 }
@@ -163,4 +174,46 @@ func (e *StackError) Touch(name string) {
 		return
 	}
 	e.Stack.Add(call)
+}
+
+// Gets the error out of the stack
+func ErrorOutOfStack(err error) error {
+	stackError, ok := err.(StackError)
+	if !ok {
+		return err
+	}
+	return stackError.Err
+}
+
+// This interface represents an error that could be touched
+// a.k. add a new note about what is happening
+//
+// as for stack errors: adding a new call
+//
+// as for van errors: creating a new wrap
+type TouchableError interface {
+	// touch function
+	Touch(name string)
+	// Error interface
+	error
+}
+
+// Function that can touch any error if possible
+//
+// Use a pointer, when using touch, or the error wouldn't change
+//
+//	func touchErr(err error) error {
+//	    vanstack.Touch(err) // wrong
+//	    vanstack.Touch(&err) // right
+//	    return err
+//	}
+func Touch(err error, name string) {
+	bufErr := err
+	touchableError, ok := bufErr.(TouchableError)
+	if !ok {
+		return
+	}
+	touchableError.Touch(name)
+
+	err = touchableError
 }

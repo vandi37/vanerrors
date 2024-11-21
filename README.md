@@ -274,6 +274,11 @@ func GetOtherError() error {
 
 fmt.Println(Get(GetError())) // "readme error: here could be the error message"
 fmt.Println(Get(GetOtherError)) // nil
+
+// Touch (wrapping without creating any new errors)
+orgErr := vanerrors.NewName("readme error", nil)
+orgErr.Touch("readme touch")
+fmt.Println(orgErr) // "readme touch, cause: readme error"
 ```
 
 Now you can do more operations with the error

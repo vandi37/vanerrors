@@ -113,7 +113,7 @@ func (e VanError) Is(target error) bool {
 	if vanTarget == nil {
 		return false
 	}
-	return vanTarget.Code == e.Code && vanTarget.Name == e.Name && e.Options == vanTarget.Options && vanTarget.Severity == e.Severity
+	return vanTarget.Code == e.Code && vanTarget.Name == e.Name && vanTarget.Severity == e.Severity
 
 }
 
