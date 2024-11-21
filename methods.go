@@ -1,6 +1,9 @@
 package vanerrors
 
-import "fmt"
+import (
+	"fmt"
+	"io"
+)
 
 // Formats the error to a string format
 // Uses the options to customize the output
@@ -19,7 +22,7 @@ func (e VanError) Error() string {
 	// Adding severity
 	if options.ShowSeverity {
 		if !options.IntSeverity {
-			err += "level: " + SeverityArray[e.Severity] + ", "
+			err += SeverityArray[e.Severity] + ", "
 		} else {
 			err += fmt.Sprintf("level: %d, ", e.Severity)
 		}
@@ -44,15 +47,12 @@ func (e VanError) Error() string {
 
 		// Adding description
 		if options.ShowDescription && e.Description != nil {
-			description := make([]byte, 4096)
-			n, errRead := e.Description.Read(description)
-			if errRead == nil {
-				description = description[:n]
-			}
-
-			err += "description: " + string(description)
-			if options.ShowCause {
-				err += ", "
+			description, _ := io.ReadAll(e.Description)
+			if len(description) > 0 {
+				err += "description: " + string(description)
+				if options.ShowCause {
+					err += ", "
+				}
 			}
 		}
 
@@ -115,6 +115,15 @@ func (e VanError) Is(target error) bool {
 	}
 	return vanTarget.Code == e.Code && vanTarget.Name == e.Name && e.Options == vanTarget.Options && vanTarget.Severity == e.Severity
 
+}
+
+// Implements the touchable error interface
+//
+// Touches the error
+func (e *VanError) Touch(name string) {
+	bufErr := *e
+	*e = NewWrap(name, bufErr, bufErr.Logger)
+	e.Options.ShowCause = true
 }
 
 // Gets the VanError if the error is it

@@ -69,8 +69,15 @@ type VanError struct {
 // The index of the value is the number of the level
 // The value is it's text
 var SeverityArray [4]string = [4]string{
-	"info",
+	"unknown",
 	"warn",
 	"error",
 	"fatal",
 }
+
+// The severity levels
+const (
+	WarnLevel  = 1
+	ErrorLevel = 2
+	FatalLevel = 3
+)

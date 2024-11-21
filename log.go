@@ -2,6 +2,7 @@ package vanerrors
 
 import (
 	"fmt"
+	"io"
 	"log"
 )
 
@@ -21,9 +22,9 @@ func (e VanError) Log() {
 	// Adding severity
 	if options.ShowSeverity {
 		if !options.IntSeverity {
-			result += "level: " + SeverityArray[e.Severity] + ", "
+			result += SeverityArray[e.Severity] + ", "
 		} else {
-			result += fmt.Sprintf("level: %d, ", e.Severity)
+			result += fmt.Sprintf("level %d, ", e.Severity)
 		}
 	}
 
@@ -46,15 +47,12 @@ func (e VanError) Log() {
 
 		// Adding description
 		if options.ShowDescription && e.Description != nil {
-			description := make([]byte, 4096)
-			n, errRead := e.Description.Read(description)
-			if errRead == nil {
-				description = description[:n]
-			}
-
-			result += "description: " + string(description)
-			if options.ShowCause {
-				result += ", "
+			description, _ := io.ReadAll(e.Description)
+			if len(description) > 0 {
+				result += "description: " + string(description)
+				if options.ShowCause {
+					result += ", "
+				}
 			}
 		}
 
