@@ -1,5 +1,10 @@
 package vanerrors
 
+import (
+	"errors"
+	"fmt"
+)
+
 // Formats the error to a string format
 // Uses the options to customize the output
 func (e VanError) Error() string {
@@ -12,8 +17,20 @@ func (e VanError) Error() string {
 	return err
 }
 
+// Creates a log of VanError based on it settings
+// Uses the logger options to customize the output
+func (e VanError) Log() {
+	if e.Logger == nil {
+		return
+	}
+	result := e.getView(true)
+
+	// Getting the result string
+	fmt.Fprintln(e.Logger, result)
+}
+
 // Checks is the target a VanError
-// If true replaces the VanError with the target
+// If true sets the target as the VanError
 func (e VanError) As(target any) bool {
 	p, ok := target.(*VanError)
 	if !ok {
@@ -23,7 +40,7 @@ func (e VanError) As(target any) bool {
 	return true
 }
 
-// Unwraps the most deep error in the VanError error stack
+// Gets the error cause
 func (e VanError) Unwrap() error {
 	return e.Cause
 }
@@ -34,23 +51,27 @@ func (e VanError) UnwrapAll() []error {
 	var err error
 	err = e
 	for {
-		if getErr := Get(err); getErr != nil {
-			err = getErr.Cause
-			if err != nil {
-				allErrors = append(allErrors, err)
-			} else {
-				break
+		err = errors.Unwrap(err)
+		if err != nil {
+			vanErr := Get(err)
+			if vanErr != nil {
+				vanErr.Options.ShowCause = false
+				err = *vanErr
 			}
+			allErrors = append(allErrors, err)
 		} else {
 			break
 		}
-	}
 
+	}
 	return allErrors
 }
 
 // Checks is the target is the same as the vanError
-// It does check date, description and log data (log options and logger)
+//
+// Check parameters:
+// - Code
+// - Name
 func (e VanError) Is(target error) bool {
 	vanTarget := Get(target)
 	if vanTarget == nil {
@@ -60,16 +81,14 @@ func (e VanError) Is(target error) bool {
 
 }
 
-// Implements the touchable error interface
-//
-// Touches the error
+// It send the original error deeper in the error stack
 func (e *VanError) Touch(name string) {
 	bufErr := *e
 	*e = NewWrap(name, bufErr, ErrorHandler{Logger: bufErr.Logger})
 	e.Options.ShowCause = true
 }
 
-// Gets the VanError if the error is it
+// it gets the VanError out of the target
 //
 // if error is a van error returns the van error
 // if error is nol a van error returns nil

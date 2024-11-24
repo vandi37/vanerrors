@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// gets the error name if it is a vanerror
+// It gets the error name
 func GetName(target error) string {
 	vanError := Get(target)
 	if vanError == nil {
@@ -14,7 +14,7 @@ func GetName(target error) string {
 	return vanError.Name
 }
 
-// gets the error message if it is a vanerror
+// Gets the error message
 func GetMessage(target error) string {
 	vanError := Get(target)
 	if vanError == nil {
@@ -23,7 +23,7 @@ func GetMessage(target error) string {
 	return vanError.Message
 }
 
-// gets the error code if it is a vanerror
+// Gets the error code
 func GetCode(target error) int {
 	vanError := Get(target)
 	if vanError == nil {
@@ -32,7 +32,7 @@ func GetCode(target error) int {
 	return vanError.Code
 }
 
-// gets the error date if it is a vanerror
+// Gets the date, when the error was created
 func GetDate(target error) *time.Time {
 	vanError := Get(target)
 	if vanError == nil {
@@ -41,7 +41,7 @@ func GetDate(target error) *time.Time {
 	return &vanError.Date
 }
 
-// gets the description if it is a vanerror
+// Gets the error description
 func GetDescription(target error) io.Reader {
 	vanError := Get(target)
 	if vanError == nil {

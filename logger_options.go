@@ -3,8 +3,6 @@ package vanerrors
 // Logger error options
 //
 // it describes the behavior of logging the error
-//
-// You can save base options into a .json file for same settings
 type LoggerOptions struct {
 	// Do you want to log the error
 	//
@@ -14,8 +12,8 @@ type LoggerOptions struct {
 	Options
 	// Do you need to log at the calling .Error() or by creating the error
 	//
-	// false : New() function
-	// true : .Error() function
+	// false : vanerrors.New() function
+	// true : err.Error() function
 	//
 	// recommended : false
 	LogBy bool `json:"log_by"`
@@ -30,6 +28,7 @@ type LoggerOptions struct {
 // Severity
 // Description
 // Cause
+// Date
 var DefaultLoggerOptions LoggerOptions = LoggerOptions{
 	DoLog: true,
 	Options: Options{

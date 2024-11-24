@@ -47,11 +47,13 @@ func (v viewMap) toJson() string {
 
 func (v viewMap) toString() string {
 	var result string
-	for i, s := range viewOrder {
+	var i int = -1
+	for _, s := range viewOrder {
 		data := v[s.name]
 		if data == nil {
 			continue
 		}
+		i++
 		result += s.viewMethod(s.name, data)
 		if s.name == "date" {
 			continue

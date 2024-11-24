@@ -5,8 +5,7 @@ import (
 	"time"
 )
 
-// An error structure
-// it has different information about the error
+// It is an error with multiple data and view and log settings
 type VanError struct {
 	// The error name
 	//
@@ -23,13 +22,6 @@ type VanError struct {
 	// you can put http status codes
 	Code int `json:"code"`
 	// The error, because of what this error was created
-	//
-	// example:
-	// if err != nil {
-	//		panic(VanError{Cause: err})
-	// }
-	//
-	// it would not be used on .Error() func, however you will see in logs it
 	Cause error `json:"error"`
 	// The error description
 	//
@@ -54,21 +46,3 @@ type VanError struct {
 	// It controls the error date
 	Date time.Time `json:"date"`
 }
-
-// An array of error levels.
-//
-// The index of the value is the number of the level
-// The value is it's text
-var SeverityArray [4]string = [4]string{
-	"unknown",
-	"warn",
-	"error",
-	"fatal",
-}
-
-// The severity levels
-const (
-	WarnLevel  = 1
-	ErrorLevel = 2
-	FatalLevel = 3
-)

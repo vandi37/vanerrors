@@ -2,18 +2,15 @@ package vanerrors
 
 // The error options
 //
-// it describes the behavior of .Error()
-//
-// You can save base options into a .json file for same settings
+// it describes the behavior of showing the error
 type Options struct {
-
 	// Do you need to show the error message
 	//
 	// recommended : true
 	ShowMessage bool `json:"show_message"`
 	// Do you need to show the error status code
 	//
-	// recommended : true
+	// recommended : false
 	ShowCode bool `json:"show_code"`
 	// Do you want to show description
 	//
@@ -37,10 +34,8 @@ type Options struct {
 //
 // Sets as showing:
 // Message
-// Code
 var DefaultOptions Options = Options{
 	ShowMessage: true,
-	ShowCode:    true,
 }
 
 // Sets your options as default for your program

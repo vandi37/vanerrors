@@ -5,16 +5,14 @@ import (
 	"time"
 )
 
-// Creates a new VanError
+// Creates a new VanError based on the settings
 //
 // sets default:
-// 1. Name == "" -> "unknown error",
-// 2. Code <= 0 -> 500,
-// 3. Severity <= 0 or Severity > 3 -> 2,
-
+// 1. errorData.Name == "" -> "unknown error",
+// 2. errorData.Code <= 0 -> 500,
+//
 // It is the most customizable function
 // You can edit the error data, options and log options
-// Be careful with severity. if it is equal to 3 it will create panic
 func New(errorData ErrorData, options Options, loggerOptions LoggerOptions) VanError {
 	// Validating name
 	if errorName := strings.TrimSpace(errorData.Name); errorName == "" {
@@ -50,27 +48,23 @@ func New(errorData ErrorData, options Options, loggerOptions LoggerOptions) VanE
 	return vanError
 }
 
-// Returns default values for New
+// IT returns default values for function vanerrors.New()
 //
-// You can use it
-// err := New(DefaultValues(errorData))
-//
-// It does not provide any customization, it only sets default values
-// If you want to have more settings use other methods
+// It sets the default options and default logger options. You can customize only the error data
 func DefaultValues(errorData ErrorData) (ErrorData, Options, LoggerOptions) {
 	return errorData, DefaultOptions, DefaultLoggerOptions
 }
 
-// Creates a new default error
-// With any error data in error data
-// It does the same as
-// err := New(DefaultValues(errorData))
+// It creates a new default van error
+//
+// It has default options and logger options, however you can change the error data like you want
 func NewDefault(errorData ErrorData) VanError {
 	return New(errorData, DefaultOptions, DefaultLoggerOptions)
 }
 
-// Creates a new error only with name and handler
-// set handler as EmptyHandler if you don't need it
+// It creates a new van error only with a name
+//
+// You can set error handler data with auto panic and logger
 func NewName(Name string, Handler ErrorHandler) VanError {
 	data, opt, logOpt := DefaultValues(ErrorData{Name: Name, ErrorHandler: Handler})
 	opt.ShowCode = false
@@ -78,24 +72,32 @@ func NewName(Name string, Handler ErrorHandler) VanError {
 	return New(data, opt, logOpt)
 }
 
-// Creates a new error with pair Name: Message
-// set handler as EmptyHandler if you don't need it
+// It creates a new van error only with name and message
+// The result would be shown as "Name: Message"
+//
+// You can set error handler data with auto panic and logger
 func NewBasic(Name string, Message string, Handler ErrorHandler) VanError {
 	data, opt, logOpt := DefaultValues(ErrorData{Name: Name, Message: Message, ErrorHandler: Handler})
 	opt.ShowCode = false
+	opt.ShowMessage = true
 	return New(data, opt, logOpt)
 }
 
-// Creates a new error with pair Code Name
-// set handler as EmptyHandler if you don't need it
+// It creates a new van error only with name and code
+// The result would be shown as "Code Name"
+//
+// You can set error handler data with auto panic and logger
 func NewHTTP(Name string, Code int, Handler ErrorHandler) VanError {
 	data, opt, logOpt := DefaultValues(ErrorData{Name: Name, Code: Code, ErrorHandler: Handler})
 	opt.ShowMessage = false
+	opt.ShowCode = true
 	return New(data, opt, logOpt)
 }
 
-// Creates a new error with Name, and error that is the error cause (it would not be shown it .Error())
-// set handler as EmptyHandler if you don't need it
+// It creates a new van error only with name and cause
+// The result would be shown as "Name, cause: Cause"
+//
+// You can set error handler data with auto panic and logger
 func NewWrap(Name string, Cause error, Handler ErrorHandler) VanError {
 	data, opt, logOpt := DefaultValues(ErrorData{Name: Name, Cause: Cause, ErrorHandler: Handler})
 	opt.ShowMessage = false

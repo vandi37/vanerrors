@@ -2,7 +2,8 @@ package vanerrors
 
 import "io"
 
-// The data to create an error
+// The data to create a van error
+// Based on this data the van error would be created
 //
 // Everything is optional, if you don't want to create one of the data just slip it
 type ErrorData struct {
@@ -22,7 +23,6 @@ type ErrorData struct {
 	Code int `json:"code"`
 	// The error, because of what this error was created
 	//
-	// it would not be used on .Error() func, however you will see in logs it
 	Cause error `json:"error"`
 	// The error description
 	//
@@ -31,6 +31,10 @@ type ErrorData struct {
 	// please add all error information here
 	Description io.Reader `json:"description"`
 	// The handler of the error data
+	//
+	// It contains
+	// - the logger
+	// - does the error need to panic automatically
 	ErrorHandler
 }
 
@@ -44,5 +48,5 @@ type ErrorHandler struct {
 	DoPanic bool `json:"do_panic"`
 }
 
-// An empty handler
+// An empty handler if you don't want to add any information
 var EmptyHandler ErrorHandler = ErrorHandler{}
