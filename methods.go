@@ -1,66 +1,9 @@
 package vanerrors
 
-import (
-	"fmt"
-	"io"
-)
-
 // Formats the error to a string format
 // Uses the options to customize the output
 func (e VanError) Error() string {
-	// Sets the return value
-	var err string
-
-	// Sets the options
-	options := e.Options
-
-	// Adding data
-	if options.ShowDate {
-		err += e.Date.Format("2006/01/02 15:04:05 ")
-	}
-
-	// Adding severity
-	if options.ShowSeverity {
-		if !options.IntSeverity {
-			err += SeverityArray[e.Severity] + ", "
-		} else {
-			err += fmt.Sprintf("level: %d, ", e.Severity)
-		}
-	}
-
-	// Adding code
-	if options.ShowCode {
-		err += fmt.Sprintf("%d ", e.Code)
-	}
-
-	// Adding name
-	err += e.Name
-
-	// Adding message
-	if options.ShowMessage {
-		err += ": " + e.Message
-	}
-
-	if options.ShowDescription || options.ShowCause {
-		// Adds ", "
-		err += ", "
-
-		// Adding description
-		if options.ShowDescription && e.Description != nil {
-			description, _ := io.ReadAll(e.Description)
-			if len(description) > 0 {
-				err += "description: " + string(description)
-				if options.ShowCause {
-					err += ", "
-				}
-			}
-		}
-
-		// Adding cause
-		if options.ShowCause && e.Cause != nil {
-			err += "cause: " + e.Cause.Error()
-		}
-	}
+	err := e.getView(false)
 	// Logging if it needs to be when called
 	if e.LoggerOptions.DoLog && e.LoggerOptions.LogBy && e.Logger != nil {
 		e.Log()
@@ -113,7 +56,7 @@ func (e VanError) Is(target error) bool {
 	if vanTarget == nil {
 		return false
 	}
-	return vanTarget.Code == e.Code && vanTarget.Name == e.Name && vanTarget.Severity == e.Severity
+	return vanTarget.Code == e.Code && vanTarget.Name == e.Name
 
 }
 
@@ -122,7 +65,7 @@ func (e VanError) Is(target error) bool {
 // Touches the error
 func (e *VanError) Touch(name string) {
 	bufErr := *e
-	*e = NewWrap(name, bufErr, bufErr.Logger)
+	*e = NewWrap(name, bufErr, ErrorHandler{Logger: bufErr.Logger})
 	e.Options.ShowCause = true
 }
 

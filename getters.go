@@ -32,24 +32,6 @@ func GetCode(target error) int {
 	return vanError.Code
 }
 
-// gets the error severity (as a string) if it is a vanerror
-func GetSeverityStr(target error) string {
-	vanError := Get(target)
-	if vanError == nil {
-		return ""
-	}
-	return SeverityArray[vanError.Severity]
-}
-
-// gets the error severity (as a int) if it is a vanerror
-func GetSeverityInt(target error) int {
-	vanError := Get(target)
-	if vanError == nil {
-		return 0
-	}
-	return vanError.Severity
-}
-
 // gets the error date if it is a vanerror
 func GetDate(target error) *time.Time {
 	vanError := Get(target)

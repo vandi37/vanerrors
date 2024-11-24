@@ -11,7 +11,7 @@ import (
 
 func TestNewName(t *testing.T) {
 	var name = "name"
-	var err = vanerrors.NewName(name, nil)
+	var err = vanerrors.NewName(name, vanerrors.EmptyHandler)
 	if err.Name != name {
 		t.Fatalf("name don't match, wait '%s', got '%s'", name, err.Name)
 	}
@@ -20,7 +20,7 @@ func TestNewName(t *testing.T) {
 func TestNewBasic(t *testing.T) {
 	var name = "name"
 	var message = "message"
-	var err = vanerrors.NewBasic(name, message, nil)
+	var err = vanerrors.NewBasic(name, message, vanerrors.EmptyHandler)
 	if err.Message != message {
 		t.Fatalf("message don't match, wait '%s', got '%s'", message, err.Message)
 	}
@@ -32,7 +32,7 @@ func TestNewBasic(t *testing.T) {
 func TestNewHTTP(t *testing.T) {
 	var name = "name"
 	var code = 400
-	var err = vanerrors.NewHTTP(name, code, nil)
+	var err = vanerrors.NewHTTP(name, code, vanerrors.EmptyHandler)
 	if err.Name != name {
 		t.Fatalf("name don't match, wait '%s', got '%s'", name, err.Name)
 	}
@@ -44,7 +44,7 @@ func TestNewHTTP(t *testing.T) {
 func TestNewWrap(t *testing.T) {
 	var name = "name"
 	var cause = errors.New("cause")
-	var err = vanerrors.NewWrap(name, cause, nil)
+	var err = vanerrors.NewWrap(name, cause, vanerrors.EmptyHandler)
 	if err.Name != name {
 		t.Fatalf("name don't match, wait '%s', got '%s'", name, err.Name)
 	}
@@ -60,8 +60,6 @@ func TestNewDefault(t *testing.T) {
 		Code:        400,
 		Cause:       errors.New("cause"),
 		Description: bytes.NewReader([]byte("description")),
-		Logger:      nil,
-		Severity:    2,
 	}
 	var err = vanerrors.NewDefault(data)
 	if err.Name != data.Name {
@@ -82,9 +80,6 @@ func TestNewDefault(t *testing.T) {
 	if err.Logger != data.Logger {
 		t.Fatalf("logger don't match, wait '%v', got '%v'", data.Logger, err.Logger)
 	}
-	if err.Severity != data.Severity {
-		t.Fatalf("severity don't match, wait '%d', got '%d'", data.Severity, err.Severity)
-	}
 }
 
 func TestDefaultValues(t *testing.T) {
@@ -94,8 +89,6 @@ func TestDefaultValues(t *testing.T) {
 		Code:        400,
 		Cause:       errors.New("cause"),
 		Description: bytes.NewReader([]byte("description")),
-		Logger:      nil,
-		Severity:    2,
 	}
 	var got, gotOptions, gotLoggerOptions = vanerrors.DefaultValues(data)
 	if got != data {
@@ -116,8 +109,6 @@ func TestNew(t *testing.T) {
 		Code:        400,
 		Cause:       errors.New("cause"),
 		Description: bytes.NewReader([]byte("description")),
-		Logger:      nil,
-		Severity:    2,
 	}
 	var err = vanerrors.New(data, vanerrors.DefaultOptions, vanerrors.DefaultLoggerOptions)
 	if err.Name != data.Name {
@@ -138,9 +129,6 @@ func TestNew(t *testing.T) {
 	if err.Logger != data.Logger {
 		t.Fatalf("logger don't match, wait '%v', got '%v'", data.Logger, err.Logger)
 	}
-	if err.Severity != data.Severity {
-		t.Fatalf("severity don't match, wait '%d', got '%d'", data.Severity, err.Severity)
-	}
 	if err.Options != vanerrors.DefaultOptions {
 		t.Fatalf("got options don't match, wait '%v', got '%v'", vanerrors.DefaultOptions, err.Options)
 	}
@@ -156,8 +144,6 @@ func TestGetters(t *testing.T) {
 		Code:        400,
 		Cause:       errors.New("cause"),
 		Description: bytes.NewReader([]byte("description")),
-		Logger:      nil,
-		Severity:    2,
 	}
 	var err = vanerrors.NewDefault(data)
 	var date = err.Date
@@ -173,12 +159,6 @@ func TestGetters(t *testing.T) {
 	if vanerrors.GetDescription(err) != err.Description {
 		t.Fatalf("description don't match, wait '%s', got '%s'", err.Description, vanerrors.GetDescription(err))
 	}
-	if err.Severity != vanerrors.GetSeverityInt(err) {
-		t.Fatalf("severity as int don't match, wait '%d', got '%d'", err.Severity, vanerrors.GetSeverityInt(err))
-	}
-	if vanerrors.SeverityArray[err.Severity] != vanerrors.GetSeverityStr(err) {
-		t.Fatalf("severity as str don't match, wait '%s', got '%s'", vanerrors.SeverityArray[err.Severity], vanerrors.GetSeverityStr(err))
-	}
 	if date.Year() != vanerrors.GetDate(err).Year() ||
 		date.Month() != vanerrors.GetDate(err).Month() ||
 		date.Day() != vanerrors.GetDate(err).Day() ||
@@ -193,17 +173,16 @@ func TestLogger(t *testing.T) {
 	var description = "description"
 	var logger = bytes.Buffer{}
 	var data = vanerrors.ErrorData{
-		Name:        "name",
-		Message:     "message",
-		Code:        400,
-		Severity:    2,
-		Cause:       errors.New("cause"),
-		Description: bytes.NewReader([]byte(description)),
-		Logger:      &logger,
+		Name:         "name",
+		Message:      "message",
+		Code:         400,
+		Cause:        errors.New("cause"),
+		Description:  bytes.NewReader([]byte(description)),
+		ErrorHandler: vanerrors.ErrorHandler{Logger: &logger},
 	}
 	_ = vanerrors.NewDefault(data)
 
-	expectedOutput := time.Now().Format("2006/01/02 15:04:05") + " error, 400 name: message, description: description, cause: cause\n"
+	expectedOutput := time.Now().Format("2006/01/02 15:04:05") + " 400 name: message, description: description, cause: cause\n"
 	if logger.String() != expectedOutput {
 		t.Fatalf("log output don't match, wait '%s', got '%s'", expectedOutput, logger.String())
 	}
@@ -215,17 +194,16 @@ func TestLoggerOnError(t *testing.T) {
 	var logger_options = vanerrors.DefaultLoggerOptions
 	logger_options.LogBy = true
 	var data = vanerrors.ErrorData{
-		Name:        "name",
-		Message:     "message",
-		Code:        400,
-		Severity:    2,
-		Cause:       errors.New("cause"),
-		Description: bytes.NewReader([]byte(description)),
-		Logger:      &logger,
+		Name:         "name",
+		Message:      "message",
+		Code:         400,
+		Cause:        errors.New("cause"),
+		Description:  bytes.NewReader([]byte(description)),
+		ErrorHandler: vanerrors.ErrorHandler{Logger: &logger},
 	}
 	var err = vanerrors.New(data, vanerrors.DefaultOptions, logger_options)
 	_ = err.Error()
-	expectedOutput := time.Now().Format("2006/01/02 15:04:05") + " error, 400 name: message, description: description, cause: cause\n"
+	expectedOutput := time.Now().Format("2006/01/02 15:04:05") + " 400 name: message, description: description, cause: cause\n"
 	if logger.String() != expectedOutput {
 		t.Fatalf("log output don't match, wait '%s', got '%s'", expectedOutput, logger.String())
 	}
@@ -237,17 +215,16 @@ func TestLoggerOnLog(t *testing.T) {
 	var logger_options = vanerrors.DefaultLoggerOptions
 	logger_options.DoLog = false
 	var data = vanerrors.ErrorData{
-		Name:        "name",
-		Message:     "message",
-		Code:        400,
-		Severity:    2,
-		Cause:       errors.New("cause"),
-		Description: bytes.NewReader([]byte(description)),
-		Logger:      &logger,
+		Name:         "name",
+		Message:      "message",
+		Code:         400,
+		Cause:        errors.New("cause"),
+		Description:  bytes.NewReader([]byte(description)),
+		ErrorHandler: vanerrors.ErrorHandler{Logger: &logger},
 	}
 	var err = vanerrors.New(data, vanerrors.DefaultOptions, logger_options)
 	err.Log()
-	expectedOutput := time.Now().Format("2006/01/02 15:04:05") + " error, 400 name: message, description: description, cause: cause\n"
+	expectedOutput := time.Now().Format("2006/01/02 15:04:05") + " 400 name: message, description: description, cause: cause\n"
 	if logger.String() != expectedOutput {
 		t.Fatalf("log output don't match, wait '%s', got '%s'", expectedOutput, logger.String())
 	}
@@ -261,46 +238,16 @@ func TestNewPanic(t *testing.T) {
 	}()
 	var logWriter bytes.Buffer
 	vanerrors.New(vanerrors.ErrorData{
-		Name:     "error name",
-		Message:  "unknown error in tests",
-		Code:     500,
-		Severity: 3,
-		Logger:   &logWriter,
+		Name:    "error name",
+		Message: "unknown error in tests",
+		Code:    500,
+		ErrorHandler: vanerrors.ErrorHandler{
+			Logger:  &logWriter,
+			DoPanic: true,
+		},
 	}, vanerrors.DefaultOptions, vanerrors.LoggerOptions{
 		DoLog: true,
 	})
-}
-func TestNewPanicOnError(t *testing.T) {
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("The code did not panic")
-		}
-	}()
-	var logWriter bytes.Buffer
-	_ = vanerrors.New(vanerrors.ErrorData{
-		Name:     "error name",
-		Message:  "unknown error in tests",
-		Code:     500,
-		Severity: 3,
-		Logger:   &logWriter,
-	}, vanerrors.DefaultOptions, vanerrors.LoggerOptions{
-		DoLog: true, LogBy: true,
-	}).Error()
-}
-func TestNewPanicOnLog(t *testing.T) {
-	defer func() {
-		if r := recover(); r == nil {
-			t.Errorf("The code did not panic")
-		}
-	}()
-	var logWriter bytes.Buffer
-	vanerrors.New(vanerrors.ErrorData{
-		Name:     "error name",
-		Message:  "unknown error in tests",
-		Code:     500,
-		Severity: 3,
-		Logger:   &logWriter,
-	}, vanerrors.DefaultOptions, vanerrors.EmptyLoggerOptions).Log()
 }
 
 func TestDefaultResults(t *testing.T) {
@@ -312,9 +259,6 @@ func TestDefaultResults(t *testing.T) {
 	if err.Code != 500 {
 		t.Fatalf("code don't match, wait '500', got '%d'", err.Code)
 	}
-	if err.Severity != 2 {
-		t.Fatalf("severity don't match, wait '2', got '%d'", err.Severity)
-	}
 }
 
 func TestError(t *testing.T) {
@@ -322,7 +266,6 @@ func TestError(t *testing.T) {
 	var options = vanerrors.Options{
 		ShowMessage:     true,
 		ShowCode:        true,
-		ShowSeverity:    true,
 		ShowDescription: true,
 		ShowCause:       true,
 		ShowDate:        true,
@@ -331,13 +274,12 @@ func TestError(t *testing.T) {
 		Name:        "name",
 		Message:     "message",
 		Code:        400,
-		Severity:    2,
 		Cause:       errors.New("cause"),
 		Description: bytes.NewReader([]byte(description)),
 	}
 	var err = vanerrors.New(data, options, vanerrors.DefaultLoggerOptions)
 	var got = err.Error()
-	expectedOutput := time.Now().Format("2006/01/02 15:04:05") + " error, 400 name: message, description: description, cause: cause"
+	expectedOutput := time.Now().Format("2006/01/02 15:04:05") + " 400 name: message, description: description, cause: cause"
 	if got != expectedOutput {
 		t.Fatalf("error output don't match, wait '%s', got '%s'", expectedOutput, got)
 	}
@@ -348,10 +290,8 @@ func TestAsAndIs(t *testing.T) {
 		Name:        "name",
 		Message:     "message",
 		Code:        400,
-		Severity:    2,
 		Cause:       errors.New("cause"),
 		Description: bytes.NewReader([]byte("description")),
-		Logger:      nil,
 	}
 	var err = vanerrors.NewDefault(data)
 
@@ -373,7 +313,7 @@ func TestAsAndIs(t *testing.T) {
 		t.Fatalf("got result in is 'true', expected 'false'")
 	}
 
-	var errNotIs = vanerrors.NewName("not that data", nil)
+	var errNotIs = vanerrors.NewName("not that data", vanerrors.EmptyHandler)
 	if err.Is(errNotIs) {
 		t.Fatalf("got result in is 'true', expected 'false'")
 	}
@@ -386,7 +326,7 @@ func TestGet(t *testing.T) {
 		t.Fatalf("got result in get '%s', expected 'nil'", VanErrNil.Error())
 	}
 
-	var errNotNil = vanerrors.NewName("name", nil)
+	var errNotNil = vanerrors.NewName("name", vanerrors.EmptyHandler)
 	var VanErrNotNil = vanerrors.Get(errNotNil)
 	if VanErrNotNil == nil {
 		t.Fatalf("got result in get '%s', expected 'name'", VanErrNotNil.Error())
@@ -405,7 +345,7 @@ func TestOptionsSetAsDefault(t *testing.T) {
 
 func TestLoggerOptionsSetAsDefault(t *testing.T) {
 	var options = vanerrors.LoggerOptions{
-		ShowMessage: true,
+		Options: vanerrors.Options{ShowMessage: true},
 	}
 	options.SetAsDefault()
 	if options != vanerrors.DefaultLoggerOptions {
@@ -420,14 +360,14 @@ func TestErrorW(t *testing.T) {
 		},
 		vanerrors.EmptyLoggerOptions,
 	)
-	err := errorW.NewBasic("name", "message", nil)
+	err := errorW.NewBasic("name", "message", vanerrors.EmptyHandler)
 	if err.Error() != "name: message" {
 		t.Fatalf("got error %s, expected name: message", err.Error())
 	}
 }
 
 func TestTouch(t *testing.T) {
-	err := vanerrors.NewName("name", nil)
+	err := vanerrors.NewName("name", vanerrors.EmptyHandler)
 	bufErr := err
 
 	err.Touch("touch")

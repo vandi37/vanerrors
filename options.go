@@ -15,16 +15,6 @@ type Options struct {
 	//
 	// recommended : true
 	ShowCode bool `json:"show_code"`
-	// Do you need to show severity level
-	//
-	// recommended : false
-	ShowSeverity bool `json:"show_severity"`
-	// Do you need to show severity level as int or string
-	// false : string
-	// true : int
-	//
-	// recommended : false
-	IntSeverity bool `json:"int_severity"`
 	// Do you want to show description
 	//
 	// recommended : false
@@ -37,6 +27,10 @@ type Options struct {
 	//
 	// recommended : false
 	ShowDate bool `json:"show_date"`
+	// Do you need to show in json format
+	//
+	// recommended : false
+	ShowAsJson bool `json:"show_as_json"`
 }
 
 // Default options

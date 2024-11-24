@@ -129,7 +129,7 @@ func NewCall(name string) (*VanCall, error) {
 		}
 	}
 	if !ok {
-		return nil, vanerrors.NewName(CouldNotGetPath, nil)
+		return nil, vanerrors.NewName(CouldNotGetPath, vanerrors.EmptyHandler)
 	}
 	var pathSlice = strings.Split(file, "/")
 	var shortPath = pathSlice[len(pathSlice)-1]

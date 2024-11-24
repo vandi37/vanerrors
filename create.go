@@ -1,7 +1,6 @@
 package vanerrors
 
 import (
-	"io"
 	"strings"
 	"time"
 )
@@ -26,9 +25,6 @@ func New(errorData ErrorData, options Options, loggerOptions LoggerOptions) VanE
 		errorData.Code = 500
 		options.ShowCode = false
 	}
-	if errorData.Severity <= 0 || errorData.Severity > 3 {
-		errorData.Severity = 2
-	}
 	// Creating a vanError
 	now := time.Now()
 	vanError := VanError{
@@ -40,12 +36,15 @@ func New(errorData ErrorData, options Options, loggerOptions LoggerOptions) VanE
 		Logger:        errorData.Logger,
 		LoggerOptions: loggerOptions,
 		Options:       options,
-		Severity:      errorData.Severity,
 		Date:          now,
 	}
 	// Logging if it needs to be when created
 	if loggerOptions.DoLog && !loggerOptions.LogBy && errorData.Logger != nil {
 		vanError.Log()
+	}
+	// Panic if needed
+	if errorData.DoPanic {
+		panic(vanError)
 	}
 
 	return vanError
@@ -70,35 +69,35 @@ func NewDefault(errorData ErrorData) VanError {
 	return New(errorData, DefaultOptions, DefaultLoggerOptions)
 }
 
-// Creates a new error only with name and logger
-// If you don't need the logger set it to nil
-func NewName(Name string, Logger io.Writer) VanError {
-	data, opt, logOpt := DefaultValues(ErrorData{Name: Name, Logger: Logger})
+// Creates a new error only with name and handler
+// set handler as EmptyHandler if you don't need it
+func NewName(Name string, Handler ErrorHandler) VanError {
+	data, opt, logOpt := DefaultValues(ErrorData{Name: Name, ErrorHandler: Handler})
 	opt.ShowCode = false
 	opt.ShowMessage = false
 	return New(data, opt, logOpt)
 }
 
 // Creates a new error with pair Name: Message
-// If you don't need the logger set it to nil
-func NewBasic(Name string, Message string, Logger io.Writer) VanError {
-	data, opt, logOpt := DefaultValues(ErrorData{Name: Name, Message: Message, Logger: Logger})
+// set handler as EmptyHandler if you don't need it
+func NewBasic(Name string, Message string, Handler ErrorHandler) VanError {
+	data, opt, logOpt := DefaultValues(ErrorData{Name: Name, Message: Message, ErrorHandler: Handler})
 	opt.ShowCode = false
 	return New(data, opt, logOpt)
 }
 
 // Creates a new error with pair Code Name
-// If you don't need the logger set it to nil
-func NewHTTP(Name string, Code int, Logger io.Writer) VanError {
-	data, opt, logOpt := DefaultValues(ErrorData{Name: Name, Code: Code, Logger: Logger})
+// set handler as EmptyHandler if you don't need it
+func NewHTTP(Name string, Code int, Handler ErrorHandler) VanError {
+	data, opt, logOpt := DefaultValues(ErrorData{Name: Name, Code: Code, ErrorHandler: Handler})
 	opt.ShowMessage = false
 	return New(data, opt, logOpt)
 }
 
 // Creates a new error with Name, and error that is the error cause (it would not be shown it .Error())
-// If you don't need the logger set it to nil
-func NewWrap(Name string, Cause error, Logger io.Writer) VanError {
-	data, opt, logOpt := DefaultValues(ErrorData{Name: Name, Cause: Cause, Logger: Logger})
+// set handler as EmptyHandler if you don't need it
+func NewWrap(Name string, Cause error, Handler ErrorHandler) VanError {
+	data, opt, logOpt := DefaultValues(ErrorData{Name: Name, Cause: Cause, ErrorHandler: Handler})
 	opt.ShowMessage = false
 	opt.ShowCode = false
 	opt.ShowCause = true

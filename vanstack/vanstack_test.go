@@ -43,7 +43,7 @@ func TestVanStack(t *testing.T) {
 }
 
 func TestStackError(t *testing.T) {
-	err := vanerrors.NewName("error", nil)
+	err := vanerrors.NewName("error", vanerrors.EmptyHandler)
 	stackError := vanstack.ToStackError(err)
 
 	if stackError.Error() != err.Error() {
@@ -52,7 +52,7 @@ func TestStackError(t *testing.T) {
 }
 
 func TestOutStack(t *testing.T) {
-	err := vanerrors.NewName("error", nil)
+	err := vanerrors.NewName("error", vanerrors.EmptyHandler)
 	stackErr := vanstack.ToStackError(err)
 	if !err.Is(vanstack.ErrorOutOfStack(stackErr)) {
 		t.Fatalf("error out of the stack error is not the original error")
@@ -64,7 +64,7 @@ func TestOutStack(t *testing.T) {
 }
 
 func TestTouch(t *testing.T) {
-	err := vanerrors.NewName("error", nil)
+	err := vanerrors.NewName("error", vanerrors.EmptyHandler)
 	stackErr := vanstack.ToStackError(err)
 
 	stackErr.Touch("call")

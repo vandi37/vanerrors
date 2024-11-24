@@ -49,15 +49,6 @@ type VanError struct {
 	//
 	// Use it to customize the program behavior
 	Options Options `json:"options"`
-	// The error level
-	//
-	// 1 for warning level
-	// 2 for error level (almost the same as warn, but better in development mode)
-	// 3 for fatal level (will stop the program)
-	//
-	// recommended to use level 2 (in development), level 1 (in production) for error situations and level 3 in fatal situations
-	// and not recommended using the level 0. it is not a logger package!!!
-	Severity int `json:"severity"`
 	// The error date
 	//
 	// It controls the error date

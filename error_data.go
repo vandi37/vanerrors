@@ -30,17 +30,19 @@ type ErrorData struct {
 	//
 	// please add all error information here
 	Description io.Reader `json:"description"`
+	// The handler of the error data
+	ErrorHandler
+}
+
+// The handler for logger and does it need to panic
+type ErrorHandler struct {
 	// The error logger
 	//
 	// it is a writer, where it will write the logs
 	Logger io.Writer `json:"logger"`
-	/// The error level
-	//
-	// 1 for warning level
-	// 2 for error level (almost the same as warn, but better in development mode)
-	// 3 for fatal level (will stop the program)
-	//
-	// recommended to use level 2 (in development), level 1 (in production) for error situations and level 3 in fatal situations
-	// and not recommended using the level 0. it is not a logger package!!!
-	Severity int `json:"severity"`
+	// Does it need to panic
+	DoPanic bool `json:"do_panic"`
 }
+
+// An empty handler
+var EmptyHandler ErrorHandler = ErrorHandler{}
