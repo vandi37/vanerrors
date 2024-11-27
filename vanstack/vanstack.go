@@ -143,7 +143,7 @@ func NewCall(name string) (*VanCall, error) {
 // a error with stack
 type StackError struct {
 	// any error
-	Err error
+	error
 	// a stack
 	Stack VanStack
 	// Do you need to show the stack
@@ -152,15 +152,15 @@ type StackError struct {
 
 func (e StackError) Error() string {
 	if len(e.Stack) > 0 && e.ShowStack {
-		return e.Err.Error() + ", stack: " + e.Stack.ToString()
+		return e.error.Error() + ", stack: " + e.Stack.ToString()
 	}
-	return e.Err.Error()
+	return e.error.Error()
 }
 
 // Makes from the error a stack error
 func ToStackError(err error) StackError {
 	result := StackError{
-		Err:       err,
+		error:     err,
 		Stack:     NewStack(),
 		ShowStack: true,
 	}
@@ -182,7 +182,7 @@ func ErrorOutOfStack(err error) error {
 	if !ok {
 		return err
 	}
-	return stackError.Err
+	return stackError.error
 }
 
 // This interface represents an error that could be touched

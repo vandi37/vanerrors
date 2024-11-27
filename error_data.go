@@ -82,3 +82,26 @@ func (h ErrorHandler) SetAsDefault() {
 func UpdateDefaultLogger() {
 	DefaultHandler.Logger = log.Default().Writer()
 }
+
+func fileHandler(fileName string, doPanic bool) ErrorHandler {
+	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0777)
+	if err != nil {
+		return EmptyHandler
+	}
+	defer file.Close()
+	data := ErrorHandler{
+		Logger:  file,
+		DoPanic: doPanic,
+	}
+	return data
+}
+
+// Opens a file and creates a handler with it
+func FileHandler(fileName string) ErrorHandler {
+	return fileHandler(fileName, false)
+}
+
+// Opens a file and creates a handler with it with panic
+func FileHandlerPanic(fileName string) ErrorHandler {
+	return fileHandler(fileName, true)
+}
