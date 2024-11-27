@@ -22,7 +22,6 @@ type ErrorData struct {
 	// you can put http status codes
 	Code int `json:"code"`
 	// The error, because of what this error was created
-	//
 	Cause error `json:"error"`
 	// The error description
 	//
