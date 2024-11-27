@@ -1,7 +1,6 @@
 package vanerrors_test
 
 import (
-	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -44,11 +43,11 @@ func ExampleNewWrap() {
 
 func ExampleNewDefault() {
 	err := vanerrors.NewDefault(vanerrors.ErrorData{
-		Name:        "readme error",                                                                      // The error name
-		Message:     "here could be the error message",                                                   // The error message
-		Code:        500,                                                                                 // The error code
-		Cause:       errors.New("some cause error"),                                                      // The cause error (it could be nil)
-		Description: bytes.NewReader([]byte("you can add more information here. the more - the better")), // The error description (as io.Reader)
+		Name:        "readme error",                                             // The error name
+		Message:     "here could be the error message",                          // The error message
+		Code:        500,                                                        // The error code
+		Cause:       errors.New("some cause error"),                             // The cause error (it could be nil)
+		Description: "you can add more information here. the more - the better", // The error description
 		ErrorHandler: vanerrors.ErrorHandler{
 			Logger:  nil,   // No logger
 			DoPanic: false, // Don't panic
@@ -66,7 +65,7 @@ func ExampleNew() {
 		Message:     "here could be the error message",
 		Code:        500,
 		Cause:       errors.New("some cause error"),
-		Description: bytes.NewReader([]byte("you can add more information here. the more - the better")),
+		Description: "you can add more information here. the more - the better",
 		ErrorHandler: vanerrors.ErrorHandler{
 			Logger:  nil,
 			DoPanic: false,
@@ -88,7 +87,7 @@ func ExampleNew() {
 		Message:     "here could be the error message",
 		Code:        500,
 		Cause:       errors.New("some cause error"),
-		Description: bytes.NewReader([]byte("you can add more information here. the more - the better")),
+		Description: "you can add more information here. the more - the better",
 		ErrorHandler: vanerrors.ErrorHandler{
 			Logger:  os.Stdout,
 			DoPanic: false,
@@ -267,7 +266,7 @@ func GetError2gGetters() error {
 		Message:     "here could be the error message",
 		Code:        500,
 		Cause:       errors.New("some cause error"),
-		Description: bytes.NewReader([]byte("you can add more information here. the more - the better")),
+		Description: "you can add more information here. the more - the better",
 	})
 }
 
@@ -283,8 +282,8 @@ func Example_getters() {
 	fmt.Println(vanerrors.GetCode(err))
 	fmt.Println(vanerrors.GetCode(err2))
 
-	fmt.Printf("%T\n", vanerrors.GetDescription(err))
-	fmt.Printf("%T\n", vanerrors.GetDescription(err2))
+	fmt.Println(vanerrors.GetDescription(err))
+	fmt.Println(vanerrors.GetDescription(err2))
 
 	// GetDate
 	fmt.Println(vanerrors.GetDate(err2))
@@ -295,7 +294,7 @@ func Example_getters() {
 	//
 	// 500
 	// 0
-	// *bytes.Reader
-	// <nil>
+	// you can add more information here. the more - the better
+	//
 	// <nil>
 }

@@ -1,7 +1,6 @@
 package vanerrors
 
 import (
-	"io"
 	"time"
 )
 
@@ -42,10 +41,10 @@ func GetDate(target error) *time.Time {
 }
 
 // Gets the error description
-func GetDescription(target error) io.Reader {
+func GetDescription(target error) string {
 	vanError := Get(target)
 	if vanError == nil {
-		return nil
+		return ""
 	}
 	return vanError.Description
 }

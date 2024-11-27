@@ -25,10 +25,8 @@ type VanError struct {
 	Cause error `json:"error"`
 	// The error description
 	//
-	// it should contain the most information, that would be displaced in logs
-	//
-	// please add all error information here
-	Description io.Reader `json:"description"`
+	// it could contain the most information
+	Description string `json:"description"`
 	// The error logger
 	//
 	// it is a writer, where it will write the logs

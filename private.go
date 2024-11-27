@@ -76,6 +76,7 @@ func (v viewMap) toString() string {
 		i++
 		result += s.viewMethod(s.name, data)
 		if s.name == "date" {
+			result += " "
 			continue
 		}
 		if i < len(v)-1 {
@@ -94,7 +95,7 @@ func (err VanError) toViewMap(LogType bool) viewMap {
 
 	// Adding date
 	if opt.ShowDate {
-		result["date"] = err.Date.Format("2006/01/02 15:04:05 ")
+		result["date"] = err.Date.Format("2006/01/02 15:04:05")
 	}
 
 	// Adding main info
@@ -117,27 +118,14 @@ func (err VanError) toViewMap(LogType bool) viewMap {
 	result["main"] = main
 
 	// Adding description
-	if opt.ShowDescription && err.Description != nil {
-		var description []byte
-		for {
-			buf := make([]byte, 2048)
-			n, readErr := err.Description.Read(buf)
-			if readErr != nil {
-				if len(description) <= 0 {
-					break
-				}
-				result["description"] = string(description)
-				break
-			}
-			description = append(description, buf[:n]...)
-		}
+	if opt.ShowDescription {
+		result["description"] = err.Description
 	}
 
 	// Adding cause
 	if opt.ShowCause && err.Cause != nil {
 		result["cause"] = err.Cause.Error()
 	}
-
 	return result
 }
 

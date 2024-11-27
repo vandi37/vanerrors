@@ -59,7 +59,7 @@ func TestNewDefault(t *testing.T) {
 		Message:     "message",
 		Code:        400,
 		Cause:       errors.New("cause"),
-		Description: bytes.NewReader([]byte("description")),
+		Description: "description",
 	}
 	var err = vanerrors.NewDefault(data)
 	if err.Name != data.Name {
@@ -88,7 +88,7 @@ func TestDefaultValues(t *testing.T) {
 		Message:     "message",
 		Code:        400,
 		Cause:       errors.New("cause"),
-		Description: bytes.NewReader([]byte("description")),
+		Description: "description",
 	}
 	var got, gotOptions, gotLoggerOptions = vanerrors.DefaultValues(data)
 	if got != data {
@@ -108,7 +108,7 @@ func TestNew(t *testing.T) {
 		Message:     "message",
 		Code:        400,
 		Cause:       errors.New("cause"),
-		Description: bytes.NewReader([]byte("description")),
+		Description: "description",
 	}
 	var err = vanerrors.New(data, vanerrors.DefaultOptions, vanerrors.DefaultLoggerOptions)
 	if err.Name != data.Name {
@@ -143,7 +143,7 @@ func TestGetters(t *testing.T) {
 		Message:     "message",
 		Code:        400,
 		Cause:       errors.New("cause"),
-		Description: bytes.NewReader([]byte("description")),
+		Description: "description",
 	}
 	var err = vanerrors.NewDefault(data)
 	var date = err.Date
@@ -177,7 +177,7 @@ func TestLogger(t *testing.T) {
 		Message:      "message",
 		Code:         400,
 		Cause:        errors.New("cause"),
-		Description:  bytes.NewReader([]byte(description)),
+		Description:  description,
 		ErrorHandler: vanerrors.ErrorHandler{Logger: &logger},
 	}
 	_ = vanerrors.NewDefault(data)
@@ -198,7 +198,7 @@ func TestLoggerOnError(t *testing.T) {
 		Message:      "message",
 		Code:         400,
 		Cause:        errors.New("cause"),
-		Description:  bytes.NewReader([]byte(description)),
+		Description:  description,
 		ErrorHandler: vanerrors.ErrorHandler{Logger: &logger},
 	}
 	var err = vanerrors.New(data, vanerrors.DefaultOptions, logger_options)
@@ -219,7 +219,7 @@ func TestLoggerOnLog(t *testing.T) {
 		Message:      "message",
 		Code:         400,
 		Cause:        errors.New("cause"),
-		Description:  bytes.NewReader([]byte(description)),
+		Description:  description,
 		ErrorHandler: vanerrors.ErrorHandler{Logger: &logger},
 	}
 	var err = vanerrors.New(data, vanerrors.DefaultOptions, logger_options)
@@ -275,7 +275,7 @@ func TestError(t *testing.T) {
 		Message:     "message",
 		Code:        400,
 		Cause:       errors.New("cause"),
-		Description: bytes.NewReader([]byte(description)),
+		Description: description,
 	}
 	var err = vanerrors.New(data, options, vanerrors.DefaultLoggerOptions)
 	var got = err.Error()
@@ -291,7 +291,7 @@ func TestAsAndIs(t *testing.T) {
 		Message:     "message",
 		Code:        400,
 		Cause:       errors.New("cause"),
-		Description: bytes.NewReader([]byte("description")),
+		Description: "description",
 	}
 	var err = vanerrors.NewDefault(data)
 
