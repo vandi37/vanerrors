@@ -359,8 +359,9 @@ func TestErrorW(t *testing.T) {
 			ShowMessage: true,
 		},
 		vanerrors.EmptyLoggerOptions,
+		vanerrors.EmptyHandler,
 	)
-	err := errorW.NewBasic("name", "message", vanerrors.EmptyHandler)
+	err := errorW.NewBasic("name", "message")
 	if err.Error() != "name: message" {
 		t.Fatalf("got error %s, expected name: message", err.Error())
 	}

@@ -8,29 +8,33 @@ type ErrorW struct {
 	Options Options `json:"options"`
 	// LoggerOptions
 	LoggerOptions LoggerOptions `json:"logger_options"`
+	// Error Handler
+	Handler ErrorHandler `json:"error_handler"`
 }
 
 // Creates a Error Writer
 // It is based on the options and logger options
-func NewW(options Options, loggerOptions LoggerOptions) ErrorW {
+func NewW(options Options, loggerOptions LoggerOptions, Handler ErrorHandler) ErrorW {
 	return ErrorW{
 		Options:       options,
 		LoggerOptions: loggerOptions,
+		Handler:       Handler,
 	}
 }
 
 // Creates a new error based on the error writer settings
 func (w ErrorW) New(errorData ErrorData) VanError {
+	errorData.ErrorHandler = w.Handler
 	return New(errorData, w.Options, w.LoggerOptions)
 }
 
 // It creates a new van error only with a name
 //
 // You can set error handler data with auto panic and logger
-func (w ErrorW) NewName(Name string, Handler ErrorHandler) VanError {
+func (w ErrorW) NewName(Name string) VanError {
 	data := ErrorData{
 		Name:         Name,
-		ErrorHandler: Handler,
+		ErrorHandler: w.Handler,
 	}
 	w.Options.ShowCode = false
 	w.Options.ShowMessage = false
@@ -41,8 +45,8 @@ func (w ErrorW) NewName(Name string, Handler ErrorHandler) VanError {
 // The result would be shown as "Name: Message"
 //
 // You can set error handler data with auto panic and logger
-func (w ErrorW) NewBasic(Name string, Message string, Handler ErrorHandler) VanError {
-	data := ErrorData{Name: Name, Message: Message, ErrorHandler: Handler}
+func (w ErrorW) NewBasic(Name string, Message string) VanError {
+	data := ErrorData{Name: Name, Message: Message, ErrorHandler: w.Handler}
 	w.Options.ShowCode = false
 	w.Options.ShowMessage = true
 	return New(data, w.Options, w.LoggerOptions)
@@ -52,8 +56,8 @@ func (w ErrorW) NewBasic(Name string, Message string, Handler ErrorHandler) VanE
 // The result would be shown as "Code Name"
 //
 // You can set error handler data with auto panic and logger
-func (w ErrorW) NewHTTP(Name string, Code int, Handler ErrorHandler) VanError {
-	data := ErrorData{Name: Name, Code: Code, ErrorHandler: Handler}
+func (w ErrorW) NewHTTP(Name string, Code int) VanError {
+	data := ErrorData{Name: Name, Code: Code, ErrorHandler: w.Handler}
 	w.Options.ShowMessage = false
 	w.Options.ShowCode = true
 	return New(data, w.Options, w.LoggerOptions)
@@ -63,8 +67,8 @@ func (w ErrorW) NewHTTP(Name string, Code int, Handler ErrorHandler) VanError {
 // The result would be shown as "Name, cause: Cause"
 //
 // You can set error handler data with auto panic and logger
-func (w ErrorW) NewWrap(Name string, Cause error, Handler ErrorHandler) VanError {
-	data := ErrorData{Name: Name, Cause: Cause, ErrorHandler: Handler}
+func (w ErrorW) NewWrap(Name string, Cause error) VanError {
+	data := ErrorData{Name: Name, Cause: Cause, ErrorHandler: w.Handler}
 	w.Options.ShowMessage = false
 	w.Options.ShowCode = false
 	w.Options.ShowCause = true

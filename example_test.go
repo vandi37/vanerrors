@@ -153,8 +153,9 @@ func ExampleNewW() {
 			ShowMessage: true,
 		},
 		vanerrors.EmptyLoggerOptions,
+		vanerrors.EmptyHandler,
 	)
-	err := errorW.NewBasic("readme error", "here could be the error message", vanerrors.EmptyHandler)
+	err := errorW.NewBasic("readme error", "here could be the error message")
 	fmt.Println(err.Error())
 
 	// Output:

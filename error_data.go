@@ -1,6 +1,10 @@
 package vanerrors
 
-import "io"
+import (
+	"io"
+	"log"
+	"os"
+)
 
 // The data to create a van error
 // Based on this data the van error would be created
@@ -45,5 +49,34 @@ type ErrorHandler struct {
 	DoPanic bool `json:"do_panic"`
 }
 
-// An empty handler if you don't want to add any information
-var EmptyHandler ErrorHandler = ErrorHandler{}
+// Different error handlers
+var (
+	// An empty handler if you don't want to add any information
+	EmptyHandler ErrorHandler = ErrorHandler{}
+
+	// An empty handler, that does panic
+	EmptyPanicHandler ErrorHandler = ErrorHandler{DoPanic: true}
+
+	// An os.Stdout handler
+	StdoutHandler ErrorHandler = ErrorHandler{Logger: os.Stdout}
+
+	// An os.Stdout handler with panic
+	StdoutPanicHandler ErrorHandler = ErrorHandler{Logger: os.Stdout, DoPanic: true}
+
+	// An os.Stderr handler
+	StderrHandler ErrorHandler = ErrorHandler{Logger: os.Stderr}
+
+	// An os.Stdout handler with panic
+	StderrPanicHandler ErrorHandler = ErrorHandler{Logger: os.Stderr, DoPanic: true}
+
+	// A default handler
+	DefaultHandler ErrorHandler = StderrHandler
+)
+
+func (h ErrorHandler) SetAsDefault() {
+	DefaultHandler = h
+}
+
+func UpdateDefaultLogger() {
+	DefaultHandler.Logger = log.Default().Writer()
+}
