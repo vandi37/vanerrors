@@ -3,20 +3,19 @@ package vanerrors
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 )
 
 func topicView(topic string, data any) string {
 	return fmt.Sprintf("%s: %v", topic, data)
 }
 
-func noTopicView(_ string, data any) string {
+func noTopicView(topic string, data any) string {
 	return fmt.Sprintf("%v", data)
 }
 
 type viewStandard struct {
 	name       string
-	viewMethod func(string, any) string
+	viewMethod func(topic string, data any) string
 }
 
 var viewOrder []viewStandard = []viewStandard{
@@ -38,11 +37,32 @@ var viewOrder []viewStandard = []viewStandard{
 	},
 }
 
+func jsonView(topic string, data any) string {
+	json_data, err := json.Marshal(data)
+	if err != nil {
+		json_data = []byte(fmt.Sprintf(`"%v"`, data))
+	}
+	return fmt.Sprintf(`"%s":%s`, topic, json_data)
+}
+
 type viewMap map[string]any
 
 func (v viewMap) toJson() string {
-	result, _ := json.Marshal(v)
-	return string(result)
+	var result string = `{`
+	var i int = -1
+	for _, s := range viewOrder {
+		data := v[s.name]
+		if data == nil {
+			continue
+		}
+		i++
+		result += jsonView(s.name, data)
+		if i < len(v)-1 {
+			result += ","
+		}
+	}
+	result += `}`
+	return result
 }
 
 func (v viewMap) toString() string {
@@ -70,7 +90,7 @@ func (err VanError) toViewMap(LogType bool) viewMap {
 	if LogType {
 		opt = err.LoggerOptions.Options
 	}
-	var result viewMap = viewMap{}
+	var result = viewMap{}
 
 	// Adding date
 	if opt.ShowDate {
@@ -98,9 +118,18 @@ func (err VanError) toViewMap(LogType bool) viewMap {
 
 	// Adding description
 	if opt.ShowDescription && err.Description != nil {
-		description, _ := io.ReadAll(err.Description)
-		if len(description) > 0 {
-			result["description"] = string(description)
+		var description []byte
+		for {
+			buf := make([]byte, 2048)
+			n, readErr := err.Description.Read(buf)
+			if readErr != nil {
+				if len(description) <= 0 {
+					break
+				}
+				result["description"] = string(description)
+				break
+			}
+			description = append(description, buf[:n]...)
 		}
 	}
 
