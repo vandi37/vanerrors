@@ -54,7 +54,7 @@ var (
 	// An empty handler if you don't want to add any information
 	EmptyHandler ErrorHandler = ErrorHandler{}
 
-	// An empty handler, that does panic
+	// An empty handler with panic
 	EmptyPanicHandler ErrorHandler = ErrorHandler{DoPanic: true}
 
 	// An os.Stdout handler
@@ -73,10 +73,12 @@ var (
 	DefaultHandler ErrorHandler = StderrHandler
 )
 
+// Sets your error handler as default for your program
 func (h ErrorHandler) SetAsDefault() {
 	DefaultHandler = h
 }
 
+// Sets logger default writer as default logger for your program
 func UpdateDefaultLogger() {
 	DefaultHandler.Logger = log.Default().Writer()
 }

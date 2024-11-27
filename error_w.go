@@ -74,3 +74,10 @@ func (w ErrorW) NewWrap(Name string, Cause error) VanError {
 	w.Options.ShowCause = true
 	return New(data, w.Options, w.LoggerOptions)
 }
+
+// Sets your error writer as default for your program
+func (w ErrorW) SetAsDefault() {
+	w.Options.SetAsDefault()
+	w.LoggerOptions.SetAsDefault()
+	w.Handler.SetAsDefault()
+}
