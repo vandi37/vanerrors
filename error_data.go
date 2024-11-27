@@ -84,7 +84,7 @@ func UpdateDefaultLogger() {
 }
 
 func fileHandler(fileName string, doPanic bool) ErrorHandler {
-	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE, 0777)
+	file, err := os.OpenFile(fileName, os.O_RDWR|os.O_CREATE|os.O_APPEND, 0777)
 	if err != nil {
 		return EmptyHandler
 	}
