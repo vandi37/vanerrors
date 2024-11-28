@@ -3,6 +3,7 @@ package vanerrors
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 )
 
 func topicView(topic string, data any) string {
@@ -110,7 +111,7 @@ func (err VanError) toViewMap(LogType bool) viewMap {
 	main += err.Name
 
 	// Adding message
-	if opt.ShowMessage {
+	if msg := strings.TrimSpace(err.Message); msg != "" && opt.ShowMessage {
 		main += ": " + err.Message
 	}
 
@@ -118,7 +119,7 @@ func (err VanError) toViewMap(LogType bool) viewMap {
 	result["main"] = main
 
 	// Adding description
-	if opt.ShowDescription {
+	if dsc := strings.TrimSpace(err.Description); dsc != "" && opt.ShowDescription {
 		result["description"] = err.Description
 	}
 

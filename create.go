@@ -105,3 +105,22 @@ func NewWrap(Name string, Cause error, Handler ErrorHandler) VanError {
 	opt.ShowCause = true
 	return New(data, opt, logOpt)
 }
+
+// Creates a new error with no additional settings
+func NewSimple(Name string, Message ...string) VanError {
+	var opt = Options{
+		ShowAsJson: DefaultOptions.ShowAsJson,
+	}
+	var data = ErrorData{
+		Name: Name,
+	}
+	if len(Message) >= 1 {
+		opt.ShowMessage = true
+		data.Message = Message[0]
+	}
+	if len(Message) > 1 {
+		opt.ShowDescription = true
+		data.Description = strings.Join(Message[:1], ", ")
+	}
+	return New(data, opt, EmptyLoggerOptions)
+}
