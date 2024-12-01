@@ -238,55 +238,6 @@ func ExampleVanError_Log() {
 	// readme error: here could be the error message
 }
 
-// func ExampleVanError_As() {
-// 	err := vanerrors.NewBasic("readme error", "here could be the error message", vanerrors.EmptyHandler)
-
-// 	var targetErr error
-// 	fmt.Println(err.As(&targetErr))
-
-// 	var targetErr2 = vanerrors.NewName("target", vanerrors.EmptyHandler)
-// 	fmt.Println(err.As(&targetErr2))
-// 	fmt.Println(err == targetErr2)
-
-// 	// Output:
-// 	// false
-// 	// true
-// 	// true
-// }
-
-// func ExampleVanError_Unwrap() {
-// 	err := vanerrors.NewBasic("readme error", "here could be the error message", vanerrors.EmptyHandler)
-
-// 	err.Cause = vanerrors.NewName("some cause", vanerrors.EmptyHandler)
-// 	fmt.Println(err.Unwrap())
-
-// 	// Output:
-// 	// some cause
-// }
-
-// func ExampleVanError_UnwrapAll() {
-// 	// UnwrapAll
-// 	err := vanerrors.NewBasic("readme error", "here could be the error message", vanerrors.EmptyHandler)
-// 	err2 := vanerrors.NewWrap("some cause", vanerrors.NewName("some other cause", vanerrors.EmptyHandler), vanerrors.EmptyHandler)
-// 	err.Cause = err2
-// 	fmt.Println(err.UnwrapAll())
-
-// 	// Output:
-// 	// [some cause some other cause]
-// }
-
-// func ExampleVanError_Is() {
-// 	err := vanerrors.NewBasic("readme error", "here could be the error message", vanerrors.EmptyHandler)
-// 	err2 := vanerrors.NewBasic("readme error", "here could be the error message", vanerrors.EmptyHandler)
-// 	fmt.Println(err.Is(err2))
-// 	err3 := vanerrors.NewBasic("other readme error", "here could be the error message", vanerrors.EmptyHandler)
-// 	fmt.Println(err3.Is(err))
-
-// 	// Output:
-// 	// true
-// 	// false
-// }
-
 func GetError() error {
 	return vanerrors.NewName("readme error", vanerrors.EmptyHandler)
 }
