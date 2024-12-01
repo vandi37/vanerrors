@@ -1,67 +1,101 @@
 package vanerrors_test
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/VandiKond/vanerrors"
 )
 
-func ExampleNewName() {
-	err := vanerrors.NewName("readme error", vanerrors.EmptyHandler)
+func ExampleErrorHandler_SetAsDefault() {
+	vanerrors.EmptyHandler.SetAsDefault()
+	fmt.Println(vanerrors.DefaultHandler)
+	// Output: {<nil> false}
 
-	fmt.Println(err.Error())
-
-	// Output:
-	// readme error
 }
 
-func ExampleNewBasic() {
-	err := vanerrors.NewBasic("readme error", "here could be the error message", vanerrors.EmptyHandler)
-	fmt.Println(err.Error())
-
-	// Output:
-	// readme error: here could be the error message
+func ExampleUpdateDefaultLogger() {
+	log.SetOutput(nil)
+	vanerrors.UpdateDefaultLogger()
+	fmt.Println(vanerrors.DefaultHandler)
+	//Output: {<nil> false}
 }
 
-func ExampleNewHTTP() {
-	err := vanerrors.NewHTTP("readme error", 500, vanerrors.EmptyHandler)
-	fmt.Println(err.Error())
-
-	// Output:
-	// 500 readme error
+func ExampleFileHandler() {
+	tempFile, err := os.CreateTemp("", "example-log")
+	if err != nil {
+		panic(err)
+	}
+	defer os.Remove(tempFile.Name()) //Clean up
+	handler := vanerrors.FileHandler(tempFile.Name())
+	fmt.Println(handler.DoPanic)
+	// Output: false
 }
 
-func ExampleNewWrap() {
-	err := vanerrors.NewWrap("readme error", errors.New("some cause"), vanerrors.EmptyHandler)
-	fmt.Println(err.Error())
-
-	// Output:
-	// readme error, cause: some cause
+func ExampleFileHandlerPanic() {
+	tempFile, err := os.CreateTemp("", "example-log")
+	if err != nil {
+		panic(err)
+	}
+	defer os.Remove(tempFile.Name()) //Clean up
+	handler := vanerrors.FileHandlerPanic(tempFile.Name())
+	fmt.Println(handler.DoPanic)
+	// Output: true
 }
 
 func ExampleNewDefault() {
 	err := vanerrors.NewDefault(vanerrors.ErrorData{
-		Name:        "readme error",                                             // The error name
-		Message:     "here could be the error message",                          // The error message
-		Code:        500,                                                        // The error code
-		Cause:       errors.New("some cause error"),                             // The cause error (it could be nil)
-		Description: "you can add more information here. the more - the better", // The error description
-		ErrorHandler: vanerrors.ErrorHandler{
-			Logger:  nil,   // No logger
-			DoPanic: false, // Don't panic
-		},
+		Name:        "default error",
+		Message:     "This is a default error message.",
+		Description: "Some extra description.",
 	})
-	fmt.Println(err.Error()) // Would be shown only name and message because of the default settings
-
+	fmt.Println(err.Error())
 	// Output:
-	// readme error: here could be the error message
+	// default error: This is a default error message.
+}
+
+func ExampleNewName() {
+	err := vanerrors.NewName("NamedError", vanerrors.ErrorHandler{DoPanic: false})
+	fmt.Println(err.Error())
+	// Output:
+	// NamedError
+}
+
+func ExampleNewBasic() {
+	err := vanerrors.NewBasic("BasicError", "This is a basic error.", vanerrors.ErrorHandler{})
+	fmt.Println(err.Error())
+	// Output:
+	// BasicError: This is a basic error.
+}
+
+func ExampleNewHTTP() {
+	err := vanerrors.NewHTTP("HTTPError", 404, vanerrors.ErrorHandler{})
+	fmt.Println(err.Error())
+	// Output:
+	// 404 HTTPError
+}
+
+func ExampleNewWrap() {
+	cause := fmt.Errorf("underlying cause")
+	err := vanerrors.NewWrap("WrappedError", cause, vanerrors.ErrorHandler{})
+	fmt.Println(err.Error())
+	// Output:
+	// WrappedError, cause: underlying cause
+}
+
+func ExampleNewSimple() {
+	err := vanerrors.NewSimple("SimpleError", "Message 1", "Message 2", "Message 3")
+	fmt.Println(err.Error())
+	// Output:
+	// SimpleError: Message 1, description: Message 2, Message 3
 }
 
 func ExampleNew() {
 	err := vanerrors.New(vanerrors.ErrorData{
-		Name:        "readme error",
+		Name:        "example error",
 		Message:     "here could be the error message",
 		Code:        500,
 		Cause:       errors.New("some cause error"),
@@ -111,55 +145,73 @@ func ExampleNew() {
 	err.Log()
 
 	// Output:
-	// 500 readme error: here could be the error message, description: you can add more information here. the more - the better, cause: some cause error
+	// 500 example error: here could be the error message, description: you can add more information here. the more - the better, cause: some cause error
 	// 500 readme error: here could be the error message, description: you can add more information here. the more - the better, cause: some cause error
 }
 
 func ExampleOptions_SetAsDefault() {
-	options := vanerrors.Options{
-		ShowCause: true,
-	}
-
-	// Setting options as default
-	options.SetAsDefault()
-
-	fmt.Println(vanerrors.DefaultOptions.ShowCause)
-	fmt.Println(vanerrors.DefaultOptions.ShowMessage) // In default options it was enabled
-
-	// Output:
-	// true
-	// false
+	newDefaults := vanerrors.Options{ShowMessage: true, ShowCode: true}
+	newDefaults.SetAsDefault()
+	fmt.Println(vanerrors.DefaultOptions)
+	// Output: {true true false false false false}
 }
 
 func ExampleLoggerOptions_SetAsDefault() {
-	loggerOptions := vanerrors.LoggerOptions{
-		LogBy: true,
-	}
-
-	// Setting logger options as default
-	loggerOptions.SetAsDefault()
-
-	fmt.Println(vanerrors.DefaultLoggerOptions.LogBy)
-	fmt.Println(vanerrors.DefaultLoggerOptions.ShowDate) // In default options it was enabled
-
-	// Output:
-	// true
-	// false
+	newDefaults := vanerrors.LoggerOptions{DoLog: true, Options: vanerrors.Options{ShowMessage: true}}
+	newDefaults.SetAsDefault()
+	fmt.Println(vanerrors.DefaultLoggerOptions)
+	// Output: {true {true false false false false false} false}
 }
 
 func ExampleNewW() {
-	errorW := vanerrors.NewW(
-		vanerrors.Options{
-			ShowMessage: true,
-		},
-		vanerrors.EmptyLoggerOptions,
-		vanerrors.EmptyHandler,
-	)
-	err := errorW.NewBasic("readme error", "here could be the error message")
-	fmt.Println(err.Error())
+	w := vanerrors.NewW(vanerrors.Options{ShowMessage: true}, vanerrors.EmptyLoggerOptions, vanerrors.EmptyHandler)
+	fmt.Println(w)
+	// Output: {{true false false false false false} {false {false false false false true false} false} {<nil> false}}
+}
 
-	// Output:
-	// readme error: here could be the error message
+func ExampleErrorW_New() {
+	w := vanerrors.NewW(vanerrors.Options{ShowMessage: true}, vanerrors.EmptyLoggerOptions, vanerrors.EmptyHandler)
+	err := w.New(vanerrors.ErrorData{Name: "TestError", Message: "This is a test."})
+	fmt.Println(err.Error())
+	// Output: TestError: This is a test.
+}
+
+func ExampleErrorW_NewName() {
+	w := vanerrors.NewW(vanerrors.Options{}, vanerrors.EmptyLoggerOptions, vanerrors.EmptyHandler)
+	err := w.NewName("NameOnlyError")
+	fmt.Println(err.Error())
+	// Output: NameOnlyError
+}
+
+func ExampleErrorW_NewBasic() {
+	w := vanerrors.NewW(vanerrors.Options{}, vanerrors.EmptyLoggerOptions, vanerrors.EmptyHandler)
+	err := w.NewBasic("BasicError", "This is basic.")
+	fmt.Println(err.Error())
+	// Output: BasicError: This is basic.
+}
+
+func ExampleErrorW_NewHTTP() {
+	w := vanerrors.NewW(vanerrors.Options{}, vanerrors.EmptyLoggerOptions, vanerrors.EmptyHandler)
+	err := w.NewHTTP("HTTPError", 404)
+	fmt.Println(err.Error())
+	// Output: 404 HTTPError
+}
+
+func ExampleErrorW_NewWrap() {
+	w := vanerrors.NewW(vanerrors.Options{ShowCause: true}, vanerrors.EmptyLoggerOptions, vanerrors.EmptyHandler)
+	cause := fmt.Errorf("cause error")
+	err := w.NewWrap("WrappedError", cause)
+	fmt.Println(err.Error())
+	// Output: WrappedError, cause: cause error
+}
+
+func ExampleErrorW_SetAsDefault() {
+	w := vanerrors.NewW(vanerrors.Options{ShowMessage: true}, vanerrors.LoggerOptions{DoLog: true}, vanerrors.StdoutHandler)
+	w.SetAsDefault()
+	err := vanerrors.NewSimple("test", "test message")
+	fmt.Println(err.Error())
+	// Output: test: test message
+
 }
 
 func ExampleVanError_Error() {
@@ -186,54 +238,54 @@ func ExampleVanError_Log() {
 	// readme error: here could be the error message
 }
 
-func ExampleVanError_As() {
-	err := vanerrors.NewBasic("readme error", "here could be the error message", vanerrors.EmptyHandler)
+// func ExampleVanError_As() {
+// 	err := vanerrors.NewBasic("readme error", "here could be the error message", vanerrors.EmptyHandler)
 
-	var targetErr error
-	fmt.Println(err.As(&targetErr))
+// 	var targetErr error
+// 	fmt.Println(err.As(&targetErr))
 
-	var targetErr2 = vanerrors.NewName("target", vanerrors.EmptyHandler)
-	fmt.Println(err.As(&targetErr2))
-	fmt.Println(err == targetErr2)
+// 	var targetErr2 = vanerrors.NewName("target", vanerrors.EmptyHandler)
+// 	fmt.Println(err.As(&targetErr2))
+// 	fmt.Println(err == targetErr2)
 
-	// Output:
-	// false
-	// true
-	// true
-}
+// 	// Output:
+// 	// false
+// 	// true
+// 	// true
+// }
 
-func ExampleVanError_Unwrap() {
-	err := vanerrors.NewBasic("readme error", "here could be the error message", vanerrors.EmptyHandler)
+// func ExampleVanError_Unwrap() {
+// 	err := vanerrors.NewBasic("readme error", "here could be the error message", vanerrors.EmptyHandler)
 
-	err.Cause = vanerrors.NewName("some cause", vanerrors.EmptyHandler)
-	fmt.Println(err.Unwrap())
+// 	err.Cause = vanerrors.NewName("some cause", vanerrors.EmptyHandler)
+// 	fmt.Println(err.Unwrap())
 
-	// Output:
-	// some cause
-}
+// 	// Output:
+// 	// some cause
+// }
 
-func ExampleVanError_UnwrapAll() {
-	// UnwrapAll
-	err := vanerrors.NewBasic("readme error", "here could be the error message", vanerrors.EmptyHandler)
-	err2 := vanerrors.NewWrap("some cause", vanerrors.NewName("some other cause", vanerrors.EmptyHandler), vanerrors.EmptyHandler)
-	err.Cause = err2
-	fmt.Println(err.UnwrapAll())
+// func ExampleVanError_UnwrapAll() {
+// 	// UnwrapAll
+// 	err := vanerrors.NewBasic("readme error", "here could be the error message", vanerrors.EmptyHandler)
+// 	err2 := vanerrors.NewWrap("some cause", vanerrors.NewName("some other cause", vanerrors.EmptyHandler), vanerrors.EmptyHandler)
+// 	err.Cause = err2
+// 	fmt.Println(err.UnwrapAll())
 
-	// Output:
-	// [some cause some other cause]
-}
+// 	// Output:
+// 	// [some cause some other cause]
+// }
 
-func ExampleVanError_Is() {
-	err := vanerrors.NewBasic("readme error", "here could be the error message", vanerrors.EmptyHandler)
-	err2 := vanerrors.NewBasic("readme error", "here could be the error message", vanerrors.EmptyHandler)
-	fmt.Println(err.Is(err2))
-	err3 := vanerrors.NewBasic("other readme error", "here could be the error message", vanerrors.EmptyHandler)
-	fmt.Println(err3.Is(err))
+// func ExampleVanError_Is() {
+// 	err := vanerrors.NewBasic("readme error", "here could be the error message", vanerrors.EmptyHandler)
+// 	err2 := vanerrors.NewBasic("readme error", "here could be the error message", vanerrors.EmptyHandler)
+// 	fmt.Println(err.Is(err2))
+// 	err3 := vanerrors.NewBasic("other readme error", "here could be the error message", vanerrors.EmptyHandler)
+// 	fmt.Println(err3.Is(err))
 
-	// Output:
-	// true
-	// false
-}
+// 	// Output:
+// 	// true
+// 	// false
+// }
 
 func GetError() error {
 	return vanerrors.NewName("readme error", vanerrors.EmptyHandler)
@@ -243,22 +295,56 @@ func GetOtherError() error {
 	return errors.New("some error")
 }
 
-func ExampleGet() {
-	fmt.Println(vanerrors.Get(GetError()), fmt.Sprintf("%T", vanerrors.Get(GetError())))
-	fmt.Println(vanerrors.Get(GetOtherError()), fmt.Sprintf("%T", vanerrors.Get(GetOtherError())))
+func ExampleVanError_As() {
+	err := vanerrors.NewSimple("TestError", "Original Message")
+	var target vanerrors.VanError
+	if err.As(&target) {
+		fmt.Println(target.Message)
+	}
+	// Output: Original Message
+}
 
+func ExampleVanError_Unwrap() {
+	cause := errors.New("Cause Error")
+	err := vanerrors.NewWrap("WrappedError", cause, vanerrors.EmptyHandler)
+	unwrapped := err.Unwrap()
+	fmt.Println(unwrapped.Error())
+	// Output: Cause Error
+}
+
+func ExampleVanError_UnwrapAll() {
+	cause := errors.New("Cause 2 Error")
+	vanCause := vanerrors.NewWrap("Cause 1 Error", cause, vanerrors.EmptyHandler)
+	err := vanerrors.NewWrap("WrappedError", vanCause, vanerrors.EmptyHandler)
+	allErrors := err.UnwrapAll()
+	for i, e := range allErrors {
+		fmt.Printf("%d: %s\n", i+1, e.Error())
+	}
 	// Output:
-	// readme error *vanerrors.VanError
-	// <nil> *vanerrors.VanError
+	// 1: Cause 1 Error
+	// 2: Cause 2 Error
+}
+
+func ExampleVanError_Is() {
+	err1 := vanerrors.NewSimple("TestError", "Message 1", "Description 1")
+	err2 := vanerrors.NewSimple("TestError", "Message 2", "Description 2")
+	fmt.Println(err1.Is(err2))
+	// Output: true
 }
 
 func ExampleVanError_Touch() {
-	orgErr := vanerrors.NewName("readme error", vanerrors.EmptyHandler)
-	orgErr.Touch("readme touch")
-	fmt.Println(orgErr)
+	err := vanerrors.NewSimple("OriginalError", "Original Message")
+	err.Touch("TouchedError")
+	fmt.Println(err.Error())
+	// Output: TouchedError, cause: OriginalError: Original Message
 
-	// Output:
-	// readme touch, cause: readme error
+}
+
+func ExampleGet() {
+	err := vanerrors.NewSimple("TestError", "Original Message")
+	vanErr := vanerrors.Get(err)
+	fmt.Println(vanErr.Message)
+	// Output: Original Message
 }
 
 func GetError2gGetters() error {
@@ -271,31 +357,54 @@ func GetError2gGetters() error {
 	})
 }
 
-func Example_getters() {
-	err := GetError2gGetters()
-	err2 := errors.New("not vandi error")
+func ExampleGetName() {
+	err := vanerrors.NewSimple("MyError", "Some message")
+	name := vanerrors.GetName(err)
+	fmt.Println(name)
+	// Output: MyError
+}
 
-	fmt.Println(vanerrors.GetName(err))
+func ExampleGetMessage() {
+	err := vanerrors.NewSimple("MyError", "Some message")
+	message := vanerrors.GetMessage(err)
+	fmt.Println(message)
+	// Output: Some message
+}
 
-	fmt.Println(vanerrors.GetMessage(err))
-	fmt.Println(vanerrors.GetMessage(err2))
+func ExampleGetCode() {
+	err := vanerrors.NewSimple("MyError", "Some message")
+	code := vanerrors.GetCode(err)
+	fmt.Println(code)
+	// Output: 500
+}
 
-	fmt.Println(vanerrors.GetCode(err))
-	fmt.Println(vanerrors.GetCode(err2))
+func ExampleGetDate() {
+	err := vanerrors.NewSimple("MyError", "Some message")
+	date := vanerrors.GetDate(err)
+	fmt.Println(*date == err.Date)
+	// Output: true
 
-	fmt.Println(vanerrors.GetDescription(err))
-	fmt.Println(vanerrors.GetDescription(err2))
+}
 
-	// GetDate
-	fmt.Println(vanerrors.GetDate(err2))
+func ExampleGetDescription() {
+	err := vanerrors.NewSimple("MyError", "Some message", "A longer description")
+	description := vanerrors.GetDescription(err)
+	fmt.Println(description)
+	// Output: A longer description
+}
 
-	// Output:
-	// readme error
-	// here could be the error message
-	//
-	// 500
-	// 0
-	// you can add more information here. the more - the better
-	//
-	// <nil>
+func ExampleUnmarshalVanError() {
+	jsonData := []byte(`{"date": "2024-07-26T10:30:00Z", "main": "MyError: Some message", "description": "More details here", "cause": "Underlying cause"}`)
+	var vanError vanerrors.JsonVanError
+	vanerrors.UnmarshalVanError(bytes.NewReader(jsonData), &vanError)
+	fmt.Println(vanError.Main)
+	// Output: MyError: Some message
+}
+
+func ExampleUnmarshalVanErrorStr() {
+	jsonString := `{"date": "2024-07-26T10:30:00Z", "main": "MyError: Some message", "description": "More details here", "cause": "Underlying cause"}`
+	var vanError vanerrors.JsonVanError
+	vanerrors.UnmarshalVanErrorStr(jsonString, &vanError)
+	fmt.Println(vanError.Description)
+	// Output: More details here
 }

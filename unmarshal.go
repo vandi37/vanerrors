@@ -1,5 +1,11 @@
 package vanerrors
 
+import (
+	"encoding/json"
+	"io"
+	"strings"
+)
+
 // The json construction of a vanerror
 type JsonVanError struct {
 	// The date
@@ -11,3 +17,15 @@ type JsonVanError struct {
 	// The cause
 	Cause string `json:"cause"`
 }
+
+// it unmarshal with any reader
+func UnmarshalVanError(r io.Reader, t *JsonVanError) {
+	json.NewDecoder(r).Decode(t)
+}
+
+// it unmarshal a string to a json van error
+func UnmarshalVanErrorStr(s string, t *JsonVanError) {
+	r := strings.NewReader(s)
+	UnmarshalVanError(r, t)
+}
+

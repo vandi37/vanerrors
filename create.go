@@ -120,7 +120,7 @@ func NewSimple(Name string, Message ...string) VanError {
 	}
 	if len(Message) > 1 {
 		opt.ShowDescription = true
-		data.Description = strings.Join(Message[:1], ", ")
+		data.Description = strings.Join(Message[1:], ", ")
 	}
 	return New(data, opt, EmptyLoggerOptions)
 }
