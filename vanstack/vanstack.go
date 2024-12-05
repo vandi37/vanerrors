@@ -114,6 +114,13 @@ func (s VanStack) ToString() string {
 	}
 	return result
 }
+func (s VanStack) String() string {
+	var result string
+	for _, c := range s {
+		result += fmt.Sprintf("%s\n", c.GetPath())
+	}
+	return result
+}
 
 // Creates a van call
 func NewCall(name string) (*VanCall, error) {
