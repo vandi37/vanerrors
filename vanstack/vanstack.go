@@ -114,6 +114,8 @@ func (s VanStack) ToString() string {
 	}
 	return result
 }
+
+// Prints the short version of the stack. use ToString for more information
 func (s VanStack) String() string {
 	var result string
 	for _, c := range s {
