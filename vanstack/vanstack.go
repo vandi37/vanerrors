@@ -3,6 +3,7 @@ package vanstack
 import (
 	"fmt"
 	"runtime"
+	"slices"
 	"strings"
 	"time"
 
@@ -63,7 +64,9 @@ func (p path) String() string {
 		set.FileLen = len(p.file) - 1
 	}
 	var res string
-	res += strings.Join(p.file[:set.FileLen], "/")
+	filepath := p.file[len(p.file)-set.FileLen:]
+	slices.Reverse(filepath)
+	res += strings.Join(filepath, "/")
 	if set.ShowFn {
 		res += " " + p.fn
 	}
@@ -174,7 +177,7 @@ func (s *VanStack) Fill(name string, n int) {
 		s.Add(&VanCall{
 			path: newPath(line, file, fn.Name(), StdSettings),
 			date: time.Now(),
-			Name: fmt.Sprintf("%s %d", name, len(s.calls)),
+			Name: fmt.Sprintf("%d %s", s.Len(), name),
 		})
 	}
 }
