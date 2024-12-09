@@ -33,14 +33,16 @@ type Call interface {
 	fmt.Stringer
 }
 
+// The path settings
 type Settings struct {
-	fileLen int
-	showFn  bool
+	FileLen int
+	ShowFn  bool
 }
 
-var stdSettings = Settings{
-	fileLen: 1,
-	showFn:  false,
+// Standard settings
+var StdSettings = Settings{
+	FileLen: 1,
+	ShowFn:  false,
 }
 
 type path struct {
@@ -54,14 +56,15 @@ func newPath(line int, file string, fn string, settings Settings) path {
 	return path{line: line, file: strings.Split(file, "/"), fn: fn, settings: settings}
 }
 
+// Convert the path to string
 func (p path) String() string {
 	set := p.settings
-	if set.fileLen < 0 || set.fileLen > len(p.file) {
-		set.fileLen = len(p.file) - 1
+	if set.FileLen <= 0 || set.FileLen > len(p.file) {
+		set.FileLen = len(p.file) - 1
 	}
 	var res string
-	res += strings.Join(p.file[set.fileLen:], "/")
-	if set.showFn {
+	res += strings.Join(p.file[set.FileLen:], "/")
+	if set.ShowFn {
 		res += " " + p.fn
 	}
 	res += fmt.Sprint(":", p.line)
@@ -97,14 +100,17 @@ func (c *VanCall) GetDate() time.Time {
 	return c.date
 }
 
+// Sets settings to the call
 func (c *VanCall) SetSettings(s Settings) {
 	c.path.settings = s
 }
 
+// Sets showing name of call
 func (c *VanCall) DoShowName(b bool) {
 	c.ShowName = b
 }
 
+// Converts van call to string
 func (c *VanCall) String() string {
 	var res string
 	if c.ShowName {
@@ -131,7 +137,7 @@ func NewCall(name string) (*VanCall, error) {
 		return nil, vanerrors.NewSimple(CouldNotGetPath)
 	}
 	return &VanCall{
-		path: newPath(line, file, fn.Name(), stdSettings),
+		path: newPath(line, file, fn.Name(), StdSettings),
 		date: time.Now(),
 		Name: name,
 	}, nil
@@ -166,7 +172,7 @@ func (s *VanStack) Fill(name string, n int) {
 		}
 		fn := runtime.FuncForPC(pc)
 		s.Add(&VanCall{
-			path: newPath(line, file, fn.Name(), stdSettings),
+			path: newPath(line, file, fn.Name(), StdSettings),
 			date: time.Now(),
 			Name: fmt.Sprintf("%s %d", name, len(s.calls)),
 		})
@@ -200,14 +206,17 @@ func (s *VanStack) String() string {
 	return result
 }
 
+// Gets the length of the stack
 func (s *VanStack) Len() int {
 	return len(s.calls)
 }
 
+// Sets the separator of the stack
 func (s *VanStack) SetSeparator(str string) {
 	s.Separator = str
 }
 
+// Gets all calls of the stack
 func (s *VanStack) GetCalls() []Call {
 	return s.calls
 }
@@ -222,6 +231,7 @@ type StackError struct {
 	ShowStack bool
 }
 
+// Converts the stack error to string
 func (e StackError) Error() string {
 	if len(e.Stack.calls) > 0 && e.ShowStack {
 		return e.error.Error() + ", stack: " + e.Stack.String()
@@ -257,6 +267,15 @@ func OutOfStack(err error) error {
 	return stackError.error
 }
 
+// Gets stack out of error
+func OutOfError(err error) *VanStack {
+	stackError, ok := err.(StackError)
+	if !ok {
+		return nil
+	}
+	return stackError.Stack
+}
+
 // This interface represents an error that could be touched
 // a.k. add a new note about what is happening
 //
@@ -274,10 +293,9 @@ type TouchableError interface {
 //
 // Use a pointer, when using touch, or the error wouldn't change
 //
-//	func touchErr(err error) error {
+//	func main() {
 //	    vanstack.Touch(err) // wrong
 //	    vanstack.Touch(&err) // right
-//	    return err
 //	}
 func Touch(err error, name string) {
 	bufErr := err
