@@ -63,7 +63,7 @@ func (p path) String() string {
 		set.FileLen = len(p.file) - 1
 	}
 	var res string
-	res += strings.Join(p.file[set.FileLen:], "/")
+	res += strings.Join(p.file[:set.FileLen], "/")
 	if set.ShowFn {
 		res += " " + p.fn
 	}
