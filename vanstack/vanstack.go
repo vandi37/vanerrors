@@ -25,6 +25,47 @@ type Call interface {
 	GetName() string
 	// Getting the call date
 	GetDate() time.Time
+	// Sets the setting of showing the path
+	SetSettings(Settings)
+	// Sets showing name
+	DoShowName(bool)
+	// Call to string
+	fmt.Stringer
+}
+
+type Settings struct {
+	fileLen int
+	showFn  bool
+}
+
+var stdSettings = Settings{
+	fileLen: 1,
+	showFn:  false,
+}
+
+type path struct {
+	line     int
+	file     []string
+	fn       string
+	settings Settings
+}
+
+func newPath(line int, file string, fn string, settings Settings) path {
+	return path{line: line, file: strings.Split(file, "/"), fn: fn, settings: settings}
+}
+
+func (p path) String() string {
+	set := p.settings
+	if set.fileLen < 0 || set.fileLen > len(p.file) {
+		set.fileLen = len(p.file) - 1
+	}
+	var res string
+	res += strings.Join(p.file[set.fileLen:], "/")
+	if set.showFn {
+		res += " " + p.fn
+	}
+	res += fmt.Sprint(":", p.line)
+	return res
 }
 
 // VanCall is a structure for Call Interface
@@ -32,103 +73,52 @@ type Call interface {
 // It has basic realization of this interface
 type VanCall struct {
 	// The path where the call was
-	path string
+	path path
 	// The call data
 	Name string
 	// The call date
 	date time.Time
+	// Show name
+	ShowName bool
 }
 
 // Gets the path to the call
-func (c VanCall) GetPath() string {
-	return c.path
+func (c *VanCall) GetPath() string {
+	return c.path.file[len(c.path.file)-1]
 }
 
 // Gets the name of the call
-func (c VanCall) GetName() string {
+func (c *VanCall) GetName() string {
 	return c.Name
 }
 
 // Gets the call date
-func (c VanCall) GetDate() time.Time {
+func (c *VanCall) GetDate() time.Time {
 	return c.date
 }
 
-// It is a slice of calls
-// It can be used as a stack trace
-type VanStack []Call
-
-// Creates a new stack
-func NewStack() VanStack {
-	return VanStack{}
+func (c *VanCall) SetSettings(s Settings) {
+	c.path.settings = s
 }
 
-// Ads a call to the stack
-func (s *VanStack) Add(call Call) {
-	*s = append([]Call{call}, *s...)
+func (c *VanCall) DoShowName(b bool) {
+	c.ShowName = b
 }
 
-// Fils the stack
-func (s *VanStack) Fill(name string, n int) {
-	for i := 1; i <= n; i++ {
-		pc, file, line, ok := runtime.Caller(i)
-		if !ok {
-			break
-		}
-		runtimeFunc := runtime.FuncForPC(pc)
-		var pathSlice = strings.Split(file, "/")
-		var shortPath = pathSlice[len(pathSlice)-1]
-		s.Add(&VanCall{
-			path: fmt.Sprintf("%s %v: %d", shortPath, runtimeFunc.Name(), line),
-			date: time.Now(),
-			Name: fmt.Sprintf("%s %d", name, len(*s)),
-		})
+func (c *VanCall) String() string {
+	var res string
+	if c.ShowName {
+		res += c.Name + " "
 	}
-}
-
-// Gets the period when the were the last and the first call
-func (s VanStack) Period() time.Duration {
-	if len(s) <= 1 {
-		return 0
-	}
-	var LastCall time.Time = s[0].GetDate()
-	var FirstCall time.Time = s[len(s)-1].GetDate()
-	for _, c := range s {
-		if c.GetDate().Before(LastCall) {
-			LastCall = c.GetDate()
-		}
-		if c.GetDate().After(FirstCall) {
-			FirstCall = c.GetDate()
-		}
-	}
-	return FirstCall.Sub(LastCall)
-}
-
-func (s VanStack) ToString() string {
-	var result string
-	for i, c := range s {
-		result += fmt.Sprintf("%s in %s", c.GetName(), c.GetPath())
-		if i < len(s)-1 {
-			result += ", "
-		}
-	}
-	return result
-}
-
-// Prints the short version of the stack. use ToString for more information
-func (s VanStack) String() string {
-	var result string
-	for _, c := range s {
-		result += fmt.Sprintf("%s\n", c.GetPath())
-	}
-	return result
+	res += c.path.String()
+	return res
 }
 
 // Creates a van call
 func NewCall(name string) (*VanCall, error) {
 
 	pc, file, line, ok := runtime.Caller(0)
-	runtimeFunc := runtime.FuncForPC(pc)
+	fn := runtime.FuncForPC(pc)
 	for i := 1; ok; i++ {
 		pc, file, line, ok = runtime.Caller(i)
 		runtimeFunc := runtime.FuncForPC(pc)
@@ -140,13 +130,86 @@ func NewCall(name string) (*VanCall, error) {
 	if !ok {
 		return nil, vanerrors.NewSimple(CouldNotGetPath)
 	}
-	var pathSlice = strings.Split(file, "/")
-	var shortPath = pathSlice[len(pathSlice)-1]
 	return &VanCall{
-		path: fmt.Sprintf("%s %v: %d", shortPath, runtimeFunc.Name(), line),
+		path: newPath(line, file, fn.Name(), stdSettings),
 		date: time.Now(),
 		Name: name,
 	}, nil
+}
+
+// It is a slice of calls
+// It can be used as a stack trace
+type VanStack struct {
+	calls     []Call
+	Separator string
+}
+
+// Creates a new stack
+func NewStack() *VanStack {
+	return &VanStack{
+		calls:     []Call{},
+		Separator: "\n",
+	}
+}
+
+// Ads a call to the stack
+func (s *VanStack) Add(call Call) {
+	s.calls = append([]Call{call}, s.calls...)
+}
+
+// Fils the stack
+func (s *VanStack) Fill(name string, n int) {
+	for i := 1; i <= n; i++ {
+		pc, file, line, ok := runtime.Caller(i)
+		if !ok {
+			break
+		}
+		fn := runtime.FuncForPC(pc)
+		s.Add(&VanCall{
+			path: newPath(line, file, fn.Name(), stdSettings),
+			date: time.Now(),
+			Name: fmt.Sprintf("%s %d", name, len(s.calls)),
+		})
+	}
+}
+
+// Gets the period when the were the last and the first call
+func (s *VanStack) Period() time.Duration {
+	if len(s.calls) <= 1 {
+		return 0
+	}
+	var LastCall time.Time = s.calls[0].GetDate()
+	var FirstCall time.Time = s.calls[len(s.calls)-1].GetDate()
+	for _, c := range s.calls {
+		if c.GetDate().Before(LastCall) {
+			LastCall = c.GetDate()
+		}
+		if c.GetDate().After(FirstCall) {
+			FirstCall = c.GetDate()
+		}
+	}
+	return FirstCall.Sub(LastCall)
+}
+
+// Prints the short version of the stack
+func (s *VanStack) String() string {
+	var result string
+	for _, c := range s.calls {
+		result += fmt.Sprintf("%v%s", c, s.Separator)
+	}
+	return result
+}
+
+func (s *VanStack) Len() int {
+	return len(s.calls)
+}
+
+func (s *VanStack) SetSeparator(str string) {
+	s.Separator = str
+}
+
+func (s *VanStack) GetCalls() []Call {
+	return s.calls
 }
 
 // a error with stack
@@ -154,14 +217,14 @@ type StackError struct {
 	// any error
 	error
 	// a stack
-	Stack VanStack
+	Stack *VanStack
 	// Do you need to show the stack
 	ShowStack bool
 }
 
 func (e StackError) Error() string {
-	if len(e.Stack) > 0 && e.ShowStack {
-		return e.error.Error() + ", stack: " + e.Stack.ToString()
+	if len(e.Stack.calls) > 0 && e.ShowStack {
+		return e.error.Error() + ", stack: " + e.Stack.String()
 	}
 	return e.error.Error()
 }
@@ -186,7 +249,7 @@ func (e *StackError) Touch(name string) {
 }
 
 // Gets the error out of the stack
-func ErrorOutOfStack(err error) error {
+func OutOfStack(err error) error {
 	stackError, ok := err.(StackError)
 	if !ok {
 		return err
