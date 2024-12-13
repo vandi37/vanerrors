@@ -4,8 +4,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/VandiKond/vanerrors"
-	"github.com/VandiKond/vanerrors/vanstack"
+	"github.com/vandi37/vanerrors"
+	"github.com/vandi37/vanerrors/vanstack"
 )
 
 func TestVanCall(t *testing.T) {

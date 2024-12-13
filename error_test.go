@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/VandiKond/vanerrors"
+	"github.com/vandi37/vanerrors"
 )
 
 func TestNewName(t *testing.T) {

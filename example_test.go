@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/VandiKond/vanerrors"
+	"github.com/vandi37/vanerrors"
 )
 
 func ExampleErrorHandler_SetAsDefault() {

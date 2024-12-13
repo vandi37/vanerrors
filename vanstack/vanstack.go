@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/VandiKond/vanerrors"
+	"github.com/vandi37/vanerrors"
 )
 
 // The errors
@@ -128,7 +128,7 @@ func NewCall(name string) (*VanCall, error) {
 	for i := 1; ok; i++ {
 		pc, file, line, ok = runtime.Caller(i)
 		runtimeFunc := runtime.FuncForPC(pc)
-		pathSlice := strings.Split(runtimeFunc.Name(), ".")
+		pathSlice := strings.Split(runtimeFunc.Name(), "/")
 		if pathSlice[len(pathSlice)-1] != "Touch" {
 			break
 		}
