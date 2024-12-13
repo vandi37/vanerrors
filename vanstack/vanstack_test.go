@@ -21,7 +21,7 @@ func TestVanCall(t *testing.T) {
 	if call.GetName() != call.Name || call.GetName() != "call" {
 		t.Fatalf("call name should be the same. expected 'call', but got '%s' and '%s'", call.Name, call.GetName())
 	}
-	path := "vanstack_test.go"
+	path := "vanstack_test.go:12"
 	if call.GetPath() != path {
 		t.Fatalf("call path should be the same. expected %s, but got '%s'", path, call.GetPath())
 	}

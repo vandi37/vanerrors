@@ -26,10 +26,12 @@ type Call interface {
 	GetName() string
 	// Getting the call date
 	GetDate() time.Time
+	// Gets the settings
+	GetSettings() Settings
 	// Sets the setting of showing the path
 	SetSettings(Settings)
 	// Sets showing name
-	DoShowName(bool)
+	SetShowName(bool)
 	// Call to string
 	fmt.Stringer
 }
@@ -41,9 +43,13 @@ type Settings struct {
 }
 
 // Standard settings
-var StdSettings = Settings{
+var DefaultSettings = Settings{
 	FileLen: 1,
 	ShowFn:  false,
+}
+
+func (s Settings) SetAsDefault() {
+	DefaultSettings = s
 }
 
 type path struct {
@@ -90,7 +96,7 @@ type VanCall struct {
 
 // Gets the path to the call
 func (c *VanCall) GetPath() string {
-	return c.path.file[len(c.path.file)-1]
+	return c.path.String()
 }
 
 // Gets the name of the call
@@ -103,13 +109,18 @@ func (c *VanCall) GetDate() time.Time {
 	return c.date
 }
 
+// Gets settings
+func (c *VanCall) GetSettings() Settings {
+	return c.path.settings
+}
+
 // Sets settings to the call
 func (c *VanCall) SetSettings(s Settings) {
 	c.path.settings = s
 }
 
 // Sets showing name of call
-func (c *VanCall) DoShowName(b bool) {
+func (c *VanCall) SetShowName(b bool) {
 	c.ShowName = b
 }
 
@@ -131,7 +142,7 @@ func NewCall(name string) (*VanCall, error) {
 	for i := 1; ok; i++ {
 		pc, file, line, ok = runtime.Caller(i)
 		runtimeFunc := runtime.FuncForPC(pc)
-		pathSlice := strings.Split(runtimeFunc.Name(), "/")
+		pathSlice := strings.Split(runtimeFunc.Name(), ".")
 		if pathSlice[len(pathSlice)-1] != "Touch" {
 			break
 		}
@@ -140,7 +151,7 @@ func NewCall(name string) (*VanCall, error) {
 		return nil, vanerrors.NewSimple(CouldNotGetPath)
 	}
 	return &VanCall{
-		path: newPath(line, file, fn.Name(), StdSettings),
+		path: newPath(line, file, fn.Name(), DefaultSettings),
 		date: time.Now(),
 		Name: name,
 	}, nil
@@ -175,7 +186,7 @@ func (s *VanStack) Fill(name string, n int) {
 		}
 		fn := runtime.FuncForPC(pc)
 		s.Add(&VanCall{
-			path: newPath(line, file, fn.Name(), StdSettings),
+			path: newPath(line, file, fn.Name(), DefaultSettings),
 			date: time.Now(),
 			Name: fmt.Sprintf("%d %s", s.Len(), name),
 		})
@@ -203,7 +214,11 @@ func (s *VanStack) Period() time.Duration {
 // Prints the short version of the stack
 func (s *VanStack) String() string {
 	var result string
-	for _, c := range s.calls {
+	for i, c := range s.calls {
+		if i == len(s.calls)-1 {
+			result += fmt.Sprintf("%v", c)
+			continue
+		}
 		result += fmt.Sprintf("%v%s", c, s.Separator)
 	}
 	return result
@@ -232,9 +247,9 @@ func (s *VanStack) SetSettings(set Settings) {
 }
 
 // Sets showing name of all calls
-func (s *VanStack) DoShowName(b bool) {
+func (s *VanStack) SetShowName(b bool) {
 	for _, c := range s.calls {
-		c.DoShowName(b)
+		c.SetShowName(b)
 	}
 }
 
