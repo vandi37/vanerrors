@@ -249,7 +249,7 @@ type StackError struct {
 }
 
 // Converts the stack error to string
-func (e StackError) Error() string {
+func (e *StackError) Error() string {
 	if len(e.Stack.calls) > 0 && e.ShowStack {
 		return e.error.Error() + ", stack: " + e.Stack.String()
 	}
@@ -257,13 +257,13 @@ func (e StackError) Error() string {
 }
 
 // Makes from the error a stack error
-func ToStackError(err error) StackError {
+func ToStackError(err error) *StackError {
 	result := StackError{
 		error:     err,
 		Stack:     NewStack(),
 		ShowStack: true,
 	}
-	return result
+	return &result
 }
 
 // Touching function for stack error
@@ -277,7 +277,7 @@ func (e *StackError) Touch(name string) {
 
 // Gets the error out of the stack
 func OutOfStack(err error) error {
-	stackError, ok := err.(StackError)
+	stackError, ok := err.(*StackError)
 	if !ok {
 		return err
 	}
@@ -286,7 +286,7 @@ func OutOfStack(err error) error {
 
 // Gets stack out of error
 func OutOfError(err error) *VanStack {
-	stackError, ok := err.(StackError)
+	stackError, ok := err.(*StackError)
 	if !ok {
 		return nil
 	}
@@ -299,7 +299,7 @@ func OutOfError(err error) *VanStack {
 // as for stack errors: adding a new call
 //
 // as for van errors: creating a new wrap
-type TouchableError interface {
+type ToucherError interface {
 	// touch function
 	Touch(name string)
 	// Error interface
@@ -307,16 +307,8 @@ type TouchableError interface {
 }
 
 // Function that can touch any error if possible
-//
-// Use a pointer, when using touch, or the error wouldn't change
-//
-//	func main() {
-//	    vanstack.Touch(err) // wrong
-//	    vanstack.Touch(&err) // right
-//	}
 func Touch(err error, name string) {
-	bufErr := err
-	touchableError, ok := bufErr.(TouchableError)
+	touchableError, ok := err.(ToucherError)
 	if !ok {
 		return
 	}

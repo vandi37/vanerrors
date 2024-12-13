@@ -295,8 +295,8 @@ func TestAsAndIs(t *testing.T) {
 	}
 	var err = vanerrors.NewDefault(data)
 
-	var errTrue vanerrors.VanError
-	res := err.As(&errTrue)
+	var errTrue = vanerrors.NewSimple("")
+	res := err.As(errTrue)
 	if !res {
 		t.Fatalf("got result in as 'false', expected 'true'")
 	}
@@ -369,11 +369,11 @@ func TestErrorW(t *testing.T) {
 
 func TestTouch(t *testing.T) {
 	err := vanerrors.NewName("name", vanerrors.EmptyHandler)
-	bufErr := err
+	bufErr := *err
 
 	err.Touch("touch")
 
-	if !errors.Is(err.Unwrap(), bufErr) {
+	if !bufErr.Is(err.Unwrap()) {
 		t.Fatalf("error out of the wrap is not the original error")
 	}
 }

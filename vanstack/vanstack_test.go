@@ -21,8 +21,8 @@ func TestVanCall(t *testing.T) {
 	if call.GetName() != call.Name || call.GetName() != "call" {
 		t.Fatalf("call name should be the same. expected 'call', but got '%s' and '%s'", call.Name, call.GetName())
 	}
-	path := "vanstack_test.go:24"
-	if call.GetPath() != "vanstack_test.go:24" {
+	path := "vanstack_test.go"
+	if call.GetPath() != path {
 		t.Fatalf("call path should be the same. expected %s, but got '%s'", path, call.GetPath())
 	}
 }
@@ -76,7 +76,7 @@ func TestTouch(t *testing.T) {
 		t.Fatalf("expected stack length 1, but got %d", len(stackErr.Stack.GetCalls()))
 	}
 
-	vanstack.Touch(&stackErr, "call")
+	vanstack.Touch(stackErr, "call")
 	if len(stackErr.Stack.GetCalls()) != 2 {
 		t.Fatalf("expected stack length 2, but got %d", len(stackErr.Stack.GetCalls()))
 	}

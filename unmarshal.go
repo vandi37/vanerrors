@@ -19,13 +19,12 @@ type JsonVanError struct {
 }
 
 // it unmarshal with any reader
-func UnmarshalVanError(r io.Reader, t *JsonVanError) {
+func Unmarshal(r io.Reader, t *JsonVanError) {
 	json.NewDecoder(r).Decode(t)
 }
 
 // it unmarshal a string to a json van error
-func UnmarshalVanErrorStr(s string, t *JsonVanError) {
+func UnmarshalString(s string, t *JsonVanError) {
 	r := strings.NewReader(s)
-	UnmarshalVanError(r, t)
+	Unmarshal(r, t)
 }
-

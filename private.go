@@ -87,12 +87,13 @@ func (v viewMap) toString() string {
 	return result
 }
 
-func (err VanError) toViewMap(LogType bool) viewMap {
+func (err *VanError) toViewMap(LogType bool) viewMap {
 	opt := err.Options
 	if LogType {
 		opt = err.LoggerOptions.Options
 	}
-	var result = viewMap{}
+
+	var result = make(viewMap)
 
 	// Adding date
 	if opt.ShowDate {
@@ -130,7 +131,7 @@ func (err VanError) toViewMap(LogType bool) viewMap {
 	return result
 }
 
-func (err VanError) getView(LogType bool) string {
+func (err *VanError) getView(LogType bool) string {
 	view_map := err.toViewMap(LogType)
 	opt := err.Options
 	if LogType {

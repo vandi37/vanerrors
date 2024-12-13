@@ -166,7 +166,7 @@ func ExampleLoggerOptions_SetAsDefault() {
 func ExampleNewW() {
 	w := vanerrors.NewW(vanerrors.Options{ShowMessage: true}, vanerrors.EmptyLoggerOptions, vanerrors.EmptyHandler)
 	fmt.Println(w)
-	// Output: {{true false false false false false} {false {false false false false true false} false} {<nil> false}}
+	// Output: &{{true false false false false false} {false {false false false false true false} false} {<nil> false}}
 }
 
 func ExampleErrorW_New() {
@@ -248,8 +248,8 @@ func GetOtherError() error {
 
 func ExampleVanError_As() {
 	err := vanerrors.NewSimple("TestError", "Original Message")
-	var target vanerrors.VanError
-	if err.As(&target) {
+	var target = vanerrors.NewSimple("")
+	if err.As(target) {
 		fmt.Println(target.Message)
 	}
 	// Output: Original Message
@@ -344,18 +344,18 @@ func ExampleGetDescription() {
 	// Output: A longer description
 }
 
-func ExampleUnmarshalVanError() {
+func ExampleUnmarshal() {
 	jsonData := []byte(`{"date": "2024-07-26T10:30:00Z", "main": "MyError: Some message", "description": "More details here", "cause": "Underlying cause"}`)
 	var vanError vanerrors.JsonVanError
-	vanerrors.UnmarshalVanError(bytes.NewReader(jsonData), &vanError)
+	vanerrors.Unmarshal(bytes.NewReader(jsonData), &vanError)
 	fmt.Println(vanError.Main)
 	// Output: MyError: Some message
 }
 
-func ExampleUnmarshalVanErrorStr() {
+func ExampleUnmarshalString() {
 	jsonString := `{"date": "2024-07-26T10:30:00Z", "main": "MyError: Some message", "description": "More details here", "cause": "Underlying cause"}`
 	var vanError vanerrors.JsonVanError
-	vanerrors.UnmarshalVanErrorStr(jsonString, &vanError)
+	vanerrors.UnmarshalString(jsonString, &vanError)
 	fmt.Println(vanError.Description)
 	// Output: More details here
 }
