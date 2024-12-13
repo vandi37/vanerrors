@@ -10,12 +10,6 @@ It has:
 - Filling the stack
 - Error with stack
 
-## How to install the package
-
-```bash
-go get github.com/VandiKond/vanerrors/vanstack
-```
-
 ## How to use?
 
 Lets start with the call
@@ -95,7 +89,7 @@ fmt.Println(stackError.Stack.ToString()) // "" // because the stack is empty
 stackErr.Touch("readme call") 
 
 // Or you can touch any error that is touchable
-vanstack.Touch(&stackErr, "readme call") // Don't forget the pointer, the compiler won't say that it is wrong with out the pointer, but the error wouldn't change if you don't use the pointer
+vanstack.Touch(stackErr, "readme call")
 
 // Getting the error out of the stack
 vanstack.ErrorOutOfStack(stackErr) // it will be the same as err
