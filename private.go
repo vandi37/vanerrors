@@ -25,6 +25,10 @@ var viewOrder []viewStandard = []viewStandard{
 		viewMethod: noTopicView,
 	},
 	{
+		name:       "code",
+		viewMethod: noTopicView,
+	},
+	{
 		name:       "main",
 		viewMethod: noTopicView,
 	},
@@ -38,78 +42,75 @@ var viewOrder []viewStandard = []viewStandard{
 	},
 }
 
-func jsonView(topic string, data any) string {
-	json_data, err := json.Marshal(data)
+func (v JsonVanError) get(s string) any {
+	switch s {
+	case "date":
+		return v.Date
+	case "code":
+		return v.Code
+	case "main":
+		return v.Main
+	case "description":
+		return v.Description
+	case "cause":
+		return v.Cause
+	default:
+		return nil
+	}
+}
+
+func (v JsonVanError) toJson() string {
+	result, err := json.Marshal(v)
 	if err != nil {
-		json_data = []byte(fmt.Sprintf(`"%v"`, data))
+		panic(NewWrap("Failed to convert error to json", err, EmptyHandler))
 	}
-	return fmt.Sprintf(`"%s":%s`, topic, json_data)
+	return string(result)
 }
 
-type viewMap map[string]any
-
-func (v viewMap) toJson() string {
-	var result string = `{`
-	var i int = -1
-	for _, s := range viewOrder {
-		data := v[s.name]
-		if data == nil {
-			continue
-		}
-		i++
-		result += jsonView(s.name, data)
-		if i < len(v)-1 {
-			result += ","
-		}
-	}
-	result += `}`
-	return result
-}
-
-func (v viewMap) toString() string {
+func (v JsonVanError) toString() string {
 	var result string
-	var i int = -1
 	for _, s := range viewOrder {
-		data := v[s.name]
-		if data == nil {
+		data := v.get(s.name)
+		if data == nil || data == "" || data == 0 {
 			continue
 		}
-		i++
+
 		result += s.viewMethod(s.name, data)
-		if s.name == "date" {
+		if s.name == "date" || s.name == "code" {
 			result += " "
 			continue
 		}
-		if i < len(v)-1 {
-			result += ", "
-		}
+		result += ", "
 	}
+
+	// So it trims only " " if it does not have a comma
+	result = strings.TrimSuffix(result, " ")
+	result = strings.TrimSuffix(result, ",")
+
 	return result
 }
 
-func (err *VanError) toViewMap(LogType bool) viewMap {
+func (err *VanError) toView(LogType bool) JsonVanError {
 	opt := err.Options
 	if LogType {
 		opt = err.LoggerOptions.Options
 	}
 
-	var result = make(viewMap)
+	var result JsonVanError
 
 	// Adding date
 	if opt.ShowDate {
-		result["date"] = err.Date.Format("2006/01/02 15:04:05")
+		result.Date = err.Date.Format(DATE_FORMAT)
 	}
-
-	// Adding main info
-	var main string
 
 	// Adding code
 	if opt.ShowCode {
-		main += fmt.Sprintf("%d ", err.Code)
+		result.Code = err.Code
 	}
 
 	// Adding name
-	main += err.Name
+	var main string
+	main = err.Name
 
 	// Adding message
 	if msg := strings.TrimSpace(err.Message); msg != "" && opt.ShowMessage {
@@ -117,22 +118,22 @@ func (err *VanError) toViewMap(LogType bool) viewMap {
 	}
 
 	// Setting the main
-	result["main"] = main
+	result.Main = main
 
 	// Adding description
 	if dsc := strings.TrimSpace(err.Description); dsc != "" && opt.ShowDescription {
-		result["description"] = err.Description
+		result.Description = err.Description
 	}
 
 	// Adding cause
 	if opt.ShowCause && err.Cause != nil {
-		result["cause"] = err.Cause.Error()
+		result.Cause = err.Cause
 	}
 	return result
 }
 
 func (err *VanError) getView(LogType bool) string {
-	view_map := err.toViewMap(LogType)
+	view_map := err.toView(LogType)
 	opt := err.Options
 	if LogType {
 		opt = err.LoggerOptions.Options

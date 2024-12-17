@@ -9,6 +9,7 @@ import (
 )
 
 func ExampleSettings_SetAsDefault() {
+	buf := vanstack.DefaultSettings
 	mySettings := vanstack.Settings{10, true}
 
 	fmt.Println(vanstack.DefaultSettings)
@@ -17,9 +18,13 @@ func ExampleSettings_SetAsDefault() {
 
 	fmt.Println(vanstack.DefaultSettings)
 
+	// Back to place
+	buf.SetAsDefault()
+
 	// Output:
 	// {1 false}
 	// {10 true}
+
 }
 
 func ExampleVanCall_GetPath() {
@@ -31,7 +36,7 @@ func ExampleVanCall_GetPath() {
 	fmt.Println(call.GetPath())
 
 	// Output:
-	// example_test.go:24
+	// example_test.go:31
 }
 
 func ExampleVanCall_GetName() {
@@ -96,7 +101,7 @@ func ExampleVanCall_String() {
 	fmt.Println(call.String())
 
 	// Output:
-	// example_test.go:89
+	// example_test.go:96
 }
 
 func ExampleVanCall_SetShowName() {
@@ -110,7 +115,7 @@ func ExampleVanCall_SetShowName() {
 	fmt.Println(call.String())
 
 	// Output:
-	// call example_test.go:101
+	// call example_test.go:108
 }
 
 func ExampleNewCall() {
@@ -122,7 +127,7 @@ func ExampleNewCall() {
 	fmt.Println(call)
 
 	// Output:
-	// example_test.go:115
+	// example_test.go:122
 }
 
 func ExampleNewStack() {
@@ -147,7 +152,7 @@ func ExampleVanStack_Add() {
 	fmt.Println(stack)
 
 	// Output:
-	// example_test.go:138
+	// example_test.go:145
 }
 
 func ExampleVanStack_Fill() {
@@ -159,7 +164,7 @@ func ExampleVanStack_Fill() {
 
 	// Output:
 	// run_example.go:63
-	// example_test.go:154
+	// example_test.go:161
 }
 
 func ExampleVanStack_Period() {
@@ -171,7 +176,7 @@ func ExampleVanStack_Period() {
 
 	stack.Fill("call", 1)
 
-	fmt.Println(stack.Period().Round(time.Millisecond))
+	fmt.Println(stack.Period().Round(time.Second))
 
 	// Output:
 	// 1s
@@ -185,7 +190,7 @@ func ExampleVanStack_String() {
 	fmt.Println(stack)
 
 	// Output:
-	// example_test.go:182
+	// example_test.go:188
 }
 
 func ExampleVanStack_Len() {
@@ -211,7 +216,7 @@ func ExampleVanStack_SetSeparator() {
 	fmt.Println(stack)
 
 	// Output:
-	// run_example.go:63, example_test.go:206, run_example.go:63, example_test.go:204
+	// run_example.go:63, example_test.go:212, run_example.go:63, example_test.go:210
 }
 
 func ExampleVanStack_GetCalls() {
@@ -224,7 +229,7 @@ func ExampleVanStack_GetCalls() {
 	fmt.Println(stack.GetCalls())
 
 	// Output:
-	// [run_example.go:63 example_test.go:222 run_example.go:63 example_test.go:220]
+	// [run_example.go:63 example_test.go:227 run_example.go:63 example_test.go:225]
 }
 
 func ExampleToStackError() {
@@ -236,7 +241,7 @@ func ExampleToStackError() {
 
 	// Output:
 	// error, stack: run_example.go:63
-	// example_test.go:233
+	// example_test.go:238
 }
 
 func ExampleStackError_Touch() {
@@ -247,7 +252,7 @@ func ExampleStackError_Touch() {
 	fmt.Println(err)
 
 	// Output:
-	// error, stack: example_test.go:245
+	// error, stack: example_test.go:250
 }
 
 func ExampleOutOfStack() {
@@ -276,5 +281,5 @@ func ExampleTouch() {
 	fmt.Println(err)
 
 	// Output:
-	// error, stack: example_test.go:274
+	// error, stack: example_test.go:279
 }

@@ -14,7 +14,7 @@ It has:
 ## How to install the package
 
 ```bash
-go get github.com/VandiKond/vanerrors
+go get github.com/vandi37/vanerrors
 ```
 
 ## How to use?
