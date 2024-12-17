@@ -344,18 +344,18 @@ func ExampleGetDescription() {
 	// Output: A longer description
 }
 
-func ExampleUnmarshal() {
+func ExampleDecode() {
 	jsonData := []byte(`{"date": "2024-07-26T10:30:00Z", "main": "MyError: Some message", "description": "More details here", "cause": "Underlying cause"}`)
 	var vanError vanerrors.JsonVanError
-	vanerrors.Unmarshal(bytes.NewReader(jsonData), &vanError)
+	vanerrors.Decode(bytes.NewReader(jsonData), &vanError)
 	fmt.Println(vanError.Main)
 	// Output: MyError: Some message
 }
 
-func ExampleUnmarshalString() {
+func ExampleDecodeString() {
 	jsonString := `{"date": "2024-07-26T10:30:00Z", "main": "MyError: Some message", "description": "More details here", "cause": "Underlying cause"}`
 	var vanError vanerrors.JsonVanError
-	vanerrors.UnmarshalString(jsonString, &vanError)
+	vanerrors.DecodeString(jsonString, &vanError)
 	fmt.Println(vanError.Description)
 	// Output: More details here
 }
