@@ -42,3 +42,13 @@ var DefaultOptions Options = Options{
 func (o Options) SetAsDefault() {
 	DefaultOptions = o
 }
+
+// Sets options to vanerror
+func (o Options) SetToError(target error) {
+	err := Get(target)
+	if err == nil {
+		return
+	}
+
+	err.Options = o
+}

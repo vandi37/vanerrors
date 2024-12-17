@@ -359,3 +359,13 @@ func ExampleDecodeString() {
 	fmt.Println(vanError.Description)
 	// Output: More details here
 }
+
+func ExampleVanError_Error_json() {
+	err := vanerrors.NewWrap("error", vanerrors.NewSimple("cause"), vanerrors.EmptyHandler)
+	err.Options.ShowAsJson = true
+
+	fmt.Println(err.Error())
+
+	// Output:
+	// {"main":"error"}
+}

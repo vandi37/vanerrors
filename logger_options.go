@@ -51,3 +51,13 @@ var EmptyLoggerOptions LoggerOptions = LoggerOptions{
 func (o LoggerOptions) SetAsDefault() {
 	DefaultLoggerOptions = o
 }
+
+// Sets logger options to vanerror
+func (o LoggerOptions) SetToError(target error) {
+	err := Get(target)
+	if err == nil {
+		return
+	}
+
+	err.LoggerOptions = o
+}

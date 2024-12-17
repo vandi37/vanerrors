@@ -127,7 +127,11 @@ func (err *VanError) toView(LogType bool) JsonVanError {
 
 	// Adding cause
 	if opt.ShowCause && err.Cause != nil {
-		result.Cause = err.Cause
+		if cause := Get(err.Cause); cause != nil {
+			result.Cause = cause.getView(LogType)
+		} else {
+			result.Cause = err.Cause
+		}
 	}
 	return result
 }
