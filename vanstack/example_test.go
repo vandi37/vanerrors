@@ -233,7 +233,7 @@ func ExampleVanStack_GetCalls() {
 }
 
 func ExampleToStackError() {
-	err := vanstack.ToStackError(vanerrors.NewSimple("error"))
+	err := vanstack.ToStackError(vanerrors.Simple("error"))
 
 	err.Stack.Fill("call", 2)
 
@@ -245,7 +245,7 @@ func ExampleToStackError() {
 }
 
 func ExampleStackError_Touch() {
-	err := vanstack.ToStackError(vanerrors.NewSimple("error"))
+	err := vanstack.ToStackError(vanerrors.Simple("error"))
 
 	err.Touch("call")
 
@@ -256,7 +256,7 @@ func ExampleStackError_Touch() {
 }
 
 func ExampleOutOfStack() {
-	err := vanstack.ToStackError(vanerrors.NewSimple("error"))
+	err := vanstack.ToStackError(vanerrors.Simple("error"))
 
 	fmt.Println(vanstack.OutOfStack(err))
 
@@ -265,7 +265,7 @@ func ExampleOutOfStack() {
 }
 
 func ExampleOutOfError() {
-	err := vanstack.ToStackError(vanerrors.NewSimple("error"))
+	err := vanstack.ToStackError(vanerrors.Simple("error"))
 
 	fmt.Println(vanstack.OutOfError(err))
 
@@ -274,7 +274,7 @@ func ExampleOutOfError() {
 }
 
 func ExampleTouch() {
-	err := vanstack.ToStackError(vanerrors.NewSimple("error"))
+	err := vanstack.ToStackError(vanerrors.Simple("error"))
 
 	vanstack.Touch(err, "call")
 

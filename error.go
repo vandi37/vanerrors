@@ -1,46 +1,85 @@
 package vanerrors
 
 import (
-	"io"
 	"time"
 )
 
-// It is an error with multiple data and view and log settings
-type VanError struct {
-	// The error name
-	//
-	// better to be short and easy to understand
-	Name string `json:"name"`
-	// The error message
-	//
-	// it could have more information about the error
-	//
-	// this information shouldn't be to long, however it should contain more information that the Name
-	Message string `json:"message"`
-	// The status code
-	//
-	// you can put http status codes
-	Code int `json:"code"`
-	// The error, because of what this error was created
-	Cause error `json:"error"`
-	// The error description
-	//
-	// it could contain the most information
-	Description string `json:"description"`
-	// The error logger
-	//
-	// it is a writer, where it will write the logs
-	Logger io.Writer `json:"logger"`
-	// The options for the logger behavior
-	//
-	// Use it to customize the program behavior
-	LoggerOptions LoggerOptions `json:"logger_options"`
-	// The options for the .Error()
-	//
-	// Use it to customize the program behavior
-	Options Options `json:"options"`
-	// The error date
-	//
-	// It controls the error date
-	Date time.Time `json:"date"`
+type name struct {
+	message string
+	basic
+}
+
+func (e name) Date() error {
+	e.basic.show_time = true
+	return &e
+}
+
+func (e *name) Error() string {
+	return e.message + e.basic.Error()
+}
+
+func Simple(message string) interface {
+	error
+	Date() error
+} {
+	return &name{message: message, basic: basic{time: time.Now()}}
+}
+
+type desc struct {
+	message     string
+	description string
+	basic
+}
+
+func (e desc) Date() error {
+	e.basic.show_time = true
+	return &e
+}
+
+func (e *desc) Error() string {
+	return e.message + " - " + e.description + e.basic.Error()
+}
+func New(message string, description string) interface {
+	error
+	Date() error
+} {
+	return &desc{message: message, description: description, basic: basic{time: time.Now()}}
+}
+
+func (e *desc) Is(target error) bool {
+	d, ok := target.(*desc)
+	if ok {
+
+		return d.message == e.message
+	}
+
+	w, ok := target.(*wrap)
+	if ok {
+		return w.message == e.message
+	}
+
+	n, ok := target.(*name)
+	if ok {
+		return n.message == e.message
+	}
+	return false
+}
+
+func (e *name) Is(target error) bool {
+	d, ok := target.(*desc)
+	if ok {
+
+		return d.message == e.message
+	}
+
+	w, ok := target.(*wrap)
+	if ok {
+		return w.message == e.message
+	}
+
+	n, ok := target.(*name)
+	if ok {
+		return n.message == e.message
+	}
+	return false
 }

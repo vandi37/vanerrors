@@ -1,6 +1,7 @@
 package vanstack_test
 
 import (
+	"errors"
 	"testing"
 	"time"
 
@@ -21,7 +22,7 @@ func TestVanCall(t *testing.T) {
 	if call.GetName() != call.Name || call.GetName() != "call" {
 		t.Fatalf("call name should be the same. expected 'call', but got '%s' and '%s'", call.Name, call.GetName())
 	}
-	path := "vanstack_test.go:12"
+	path := "vanstack_test.go:13"
 	if call.GetPath() != path {
 		t.Fatalf("call path should be the same. expected %s, but got '%s'", path, call.GetPath())
 	}
@@ -47,7 +48,7 @@ func TestVanStack(t *testing.T) {
 }
 
 func TestStackError(t *testing.T) {
-	err := vanerrors.NewName("error", vanerrors.EmptyHandler)
+	err := vanerrors.Simple("error")
 	stackError := vanstack.ToStackError(err)
 
 	if stackError.Error() != err.Error() {
@@ -56,19 +57,19 @@ func TestStackError(t *testing.T) {
 }
 
 func TestOutStack(t *testing.T) {
-	err := vanerrors.NewName("error", vanerrors.EmptyHandler)
+	err := vanerrors.Simple("error")
 	stackErr := vanstack.ToStackError(err)
-	if !err.Is(vanstack.OutOfStack(stackErr)) {
+	if !errors.Is(err, vanstack.OutOfStack(stackErr)) {
 		t.Fatalf("error out of the stack error is not the original error")
 	}
 
-	if !err.Is(vanstack.OutOfStack(err)) {
+	if !errors.Is(err, vanstack.OutOfStack(err)) {
 		t.Fatalf("error out of the stack error is not it self")
 	}
 }
 
 func TestTouch(t *testing.T) {
-	err := vanerrors.NewName("error", vanerrors.EmptyHandler)
+	err := vanerrors.Simple("error")
 	stackErr := vanstack.ToStackError(err)
 
 	stackErr.Touch("call")

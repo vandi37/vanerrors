@@ -148,7 +148,7 @@ func NewCall(name string) (*VanCall, error) {
 		}
 	}
 	if !ok {
-		return nil, vanerrors.NewSimple(CouldNotGetPath)
+		return nil, vanerrors.Simple(CouldNotGetPath)
 	}
 	return &VanCall{
 		path: newPath(line, file, fn.Name(), DefaultSettings),
