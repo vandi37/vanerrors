@@ -3,13 +3,6 @@
 ## What is vanerrors?
 
 A simple package for working with errors
-It has:
-
-- Creating custom errors
-- Custom display settings
-- Optional simple logger
-- Custom logger settings
-- Methods that allow using VanError as an error and easer compare with them using errors package
 
 ## How to install the package
 
